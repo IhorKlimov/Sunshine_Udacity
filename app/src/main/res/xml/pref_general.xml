@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditTextPreference
+        android:defaultValue="@string/location_default_value"
+        android:key="@string/location_key"
+        android:singleLine="true"
+        android:inputType="text"
+        android:title="@string/location_title" />
+
+    <ListPreference
+        android:key="@string/unit_system_key"
+        android:title="Unit System"
+        android:entries="@array/units_names_array"
+        android:entryValues="@array/units_array"
+        android:defaultValue="2"
+        android:summary="%s"/>
+
+</PreferenceScreen>

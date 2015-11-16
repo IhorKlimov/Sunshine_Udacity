@@ -1,25 +1,16 @@
 package com.example.igorklimov.sunshine;
 
-import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.text.format.Time;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import com.example.igorklimov.sunshine.data.WeatherContract;
-import com.example.igorklimov.sunshine.data.WeatherContract.LocationEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
-import com.example.igorklimov.sunshine.data.WeatherDbHelper;
-import com.example.igorklimov.sunshine.data.WeatherProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,18 +22,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Vector;
 
 public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
-    private final Context mContext;
+    private final Context context;
 
     public FetchWeatherTask(Context context) {
-        mContext = context;
+        this.context = context;
     }
 
     private boolean DEBUG = true;
@@ -60,7 +49,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
         long locationId;
 
         // First, check if the location with this city name exists in the db
-        Cursor locationCursor = mContext.getContentResolver().query(
+        Cursor locationCursor = context.getContentResolver().query(
                 WeatherContract.LocationEntry.CONTENT_URI,
                 new String[]{WeatherContract.LocationEntry._ID},
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
@@ -83,7 +72,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
 
             // Finally, insert location data into the database.
-            Uri insertedUri = mContext.getContentResolver().insert(
+            Uri insertedUri = context.getContentResolver().insert(
                     WeatherContract.LocationEntry.CONTENT_URI,
                     locationValues
             );
@@ -230,7 +219,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             if ( cVVector.size() > 0 ) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                inserted = mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
+                inserted = context.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
             }
 
             Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
@@ -291,11 +280,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
             // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if (inputStream == null) {
-                // Nothing to do.
-                return null;
-            }
+            StringBuilder buffer = new StringBuilder();
+            if (inputStream == null) return null;
+
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
             String line;
@@ -303,13 +290,11 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                 // But it does make debugging a *lot* easier if you print out the completed
                 // buffer for debugging.
-                buffer.append(line + "\n");
+                buffer.append(line).append("\n");
             }
 
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return null;
-            }
+            if (buffer.length() == 0) return null;
+
             forecastJsonStr = buffer.toString();
             getWeatherDataFromJson(forecastJsonStr, locationQuery);
         } catch (IOException e) {

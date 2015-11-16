@@ -7,6 +7,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.igorklimov.sunshine.data.WeatherContract;
@@ -20,28 +21,22 @@ public class ForecastAdapter extends CursorAdapter {
         super(context, c, flags);
     }
 
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    private String formatHighLows(double high, double low) {
-        boolean isMetric = Utility.isMetric(mContext);
-        String highLowStr = Utility.formatTemperature(high, isMetric) + "/" + Utility.formatTemperature(low, isMetric);
-        return highLowStr;
+    private String getDate(Cursor cursor) {
+        return Utility.formatDate(cursor.getLong(ForecastFragment.COL_WEATHER_DATE));
     }
 
-    /*
-        This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
-        string.
-     */
-    private String convertCursorRowToUXFormat(Cursor cursor) {
+    private String getDetails(Cursor cursor) {
+        return cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+    }
 
-        String highAndLow = formatHighLows(
-                cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
-                cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP));
+    private String getHighs(Cursor cursor) {
+        return Utility.formatTemperature(cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
+                Utility.isMetric(mContext))+ "\u00b0";
+    }
 
-        return Utility.formatDate(cursor.getLong(ForecastFragment.COL_WEATHER_DATE)) +
-                " - " + cursor.getString(ForecastFragment.COL_WEATHER_DESC) +
-                " - " + highAndLow;
+    private String getLows(Cursor cursor) {
+        return Utility.formatTemperature(cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP),
+                Utility.isMetric(mContext)) + "\u00b0";
     }
 
     /*
@@ -49,9 +44,7 @@ public class ForecastAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item_forecast, parent, false);
-
-        return view;
+        return LayoutInflater.from(context).inflate(R.layout.list_item_forecast, parent, false);
     }
 
     /*
@@ -62,7 +55,15 @@ public class ForecastAdapter extends CursorAdapter {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
 
-        TextView tv = (TextView)view;
-        tv.setText(convertCursorRowToUXFormat(cursor));
+        LinearLayout layout = (LinearLayout) view;
+        TextView date = (TextView) layout.findViewById(R.id.item_forecast_textview_date);
+        TextView forecast = (TextView) layout.findViewById(R.id.item_forecast_textview_details);
+        TextView high = (TextView) layout.findViewById(R.id.item_forecast_textview_high);
+        TextView low = (TextView) layout.findViewById(R.id.item_forecast_textview_low);
+
+        date.setText(getDate(cursor));
+        forecast.setText(getDetails(cursor));
+        high.setText(getHighs(cursor));
+        low.setText(getLows(cursor));
     }
 }

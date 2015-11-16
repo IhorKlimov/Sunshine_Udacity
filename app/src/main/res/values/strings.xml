@@ -16,4 +16,5 @@
     <string name="unit_system_key">unit_system</string>
     <string name="action_location">Location</string>
     <string name="title_menu_share">Share</string>
+    <string name="descript">Image</string>
 </resources>

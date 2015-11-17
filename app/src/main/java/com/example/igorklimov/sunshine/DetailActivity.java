@@ -20,6 +20,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.igorklimov.sunshine.data.WeatherContract;
+import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
+
+import org.w3c.dom.Text;
+
+import java.text.ParseException;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -62,11 +67,15 @@ public class DetailActivity extends AppCompatActivity {
         private static final int DETAIL_LOADER = 0;
 
         private static final String[] FORECAST_COLUMNS = {
-                WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
-                WeatherContract.WeatherEntry.COLUMN_DATE,
-                WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
-                WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
-                WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
+                WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+                WeatherEntry.COLUMN_DATE,
+                WeatherEntry.COLUMN_SHORT_DESC,
+                WeatherEntry.COLUMN_MAX_TEMP,
+                WeatherEntry.COLUMN_MIN_TEMP,
+                WeatherEntry.COLUMN_HUMIDITY,
+                WeatherEntry.COLUMN_WIND_SPEED,
+                WeatherEntry.COLUMN_PRESSURE,
+                WeatherEntry.COLUMN_DEGREES
         };
 
         // these constants correspond to the projection defined above, and must change if the
@@ -76,6 +85,10 @@ public class DetailActivity extends AppCompatActivity {
         private static final int COL_WEATHER_DESC = 2;
         private static final int COL_WEATHER_MAX_TEMP = 3;
         private static final int COL_WEATHER_MIN_TEMP = 4;
+        private static final int COL_WEATHER_HUMIDITY = 5;
+        private static final int COL_WEATHER_WIND_SPEED = 6;
+        private static final int COL_WEATHER_PRESSURE = 7;
+        private static final int COL_WEATHER_DEGREES = 8;
 
         public DetailFragment() {
             setHasOptionsMenu(true);
@@ -95,12 +108,12 @@ public class DetailActivity extends AppCompatActivity {
             MenuItem menuItem = menu.findItem(R.id.menu_share);
 
             // Get the provider and hold onto it to set/change the share intent.
-            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+//            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
             // If onLoadFinished happens before this, we can go ahead and set the share intent now.
-            if (mForecast != null) {
-                mShareActionProvider.setShareIntent(createShareForecastIntent());
-            }
+//            if (mForecast != null) {
+//                mShareActionProvider.setShareIntent(createShareForecastIntent());
+//            }
         }
 
         private Intent createShareForecastIntent() {
@@ -121,9 +134,7 @@ public class DetailActivity extends AppCompatActivity {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             Log.v(LOG_TAG, "In onCreateLoader");
             Intent intent = getActivity().getIntent();
-            if (intent == null) {
-                return null;
-            }
+            if (intent == null) return null;
 
             // Now create and return a CursorLoader that will take care of
             // creating a Cursor for the data being displayed.
@@ -133,24 +144,41 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             Log.v(LOG_TAG, "In onLoadFinished");
-            if (!data.moveToFirst()) {
-                return;
-            }
-
-            String dateString = Utility.formatDate(data.getLong(COL_WEATHER_DATE));
-
-            String weatherDescription = data.getString(COL_WEATHER_DESC);
+            if (!data.moveToFirst()) return;
 
             boolean isMetric = Utility.isMetric(getActivity());
 
-            String high = Utility.formatTemperature(data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
+            String dateString = Utility.formatDate(data.getLong(COL_WEATHER_DATE));
+            String weatherDescription = data.getString(COL_WEATHER_DESC);
+            String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
+            String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
+            String weekDay = Utility.getWeekDay(dateString);
+            String humidity = Utility.formatHumidity(getContext(), data.getInt(COL_WEATHER_HUMIDITY));
+            String wind = Utility.formatWindSpeed(getContext(), data.getDouble(COL_WEATHER_WIND_SPEED),
+                    data.getDouble(COL_WEATHER_DEGREES));
+            String pressure = Utility.formatPressure(getContext(), data.getDouble(COL_WEATHER_PRESSURE));
 
-            String low = Utility.formatTemperature(data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
+            View view = getView();
+            if (view != null) {
+                TextView weekD = (TextView) view.findViewById(R.id.details_week_day);
+                TextView date = (TextView) view.findViewById(R.id.details_date);
+                TextView h = (TextView) view.findViewById(R.id.details_high);
+                TextView l = (TextView) view.findViewById(R.id.details_low);
+                TextView d = (TextView) view.findViewById(R.id.details_description);
+                TextView hum = (TextView) view.findViewById(R.id.details_humidity);
+                TextView w = (TextView) view.findViewById(R.id.details_wind);
+                TextView p = (TextView) view.findViewById(R.id.details_pressure);
 
-            mForecast = String.format("%s - %s - %s/%s", dateString, weatherDescription, high, low);
+                weekD.setText(weekDay);
+                date.setText(dateString.substring(0, 6));
+                h.setText(high);
+                l.setText(low);
+                d.setText(weatherDescription);
+                hum.setText(humidity);
+                w.setText(wind);
+                p.setText(pressure);
+            }
 
-            TextView detailTextView = (TextView) getView().findViewById(R.id.extra_text);
-            detailTextView.setText(mForecast);
 
             // If onCreateOptionsMenu has already happened, we need to update the share intent now.
             if (mShareActionProvider != null) {

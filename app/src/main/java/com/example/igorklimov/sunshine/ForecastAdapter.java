@@ -5,9 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,13 +23,25 @@ import java.util.Locale;
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
 public class ForecastAdapter extends CursorAdapter {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d", Locale.US);
-    private static final SimpleDateFormat WEEK_DAY_FORMAT = new SimpleDateFormat("EEEE", Locale.US);
-    private static final SimpleDateFormat FULL_FORMAT = new SimpleDateFormat("MMM d, yyyy", Locale.US);
-    private static final int TODAY = Integer.parseInt(DATE_FORMAT.format(new Date(System.currentTimeMillis())));
+
+    private static final int VIEW_TYPE_TODAY = 0;
+    private static final int VIEW_TYPE_FUTURE_DAY = 1;
+
+    private final Context context;
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        this.context = context;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
     }
 
     private String getDate(Cursor cursor) {
@@ -39,13 +53,13 @@ public class ForecastAdapter extends CursorAdapter {
     }
 
     private String getHighs(Cursor cursor) {
-        return Utility.formatTemperature(cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
-                Utility.isMetric(mContext)) + "\u00b0";
+        return Utility.formatTemperature(context, cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
+                Utility.isMetric(mContext));
     }
 
     private String getLows(Cursor cursor) {
-        return Utility.formatTemperature(cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP),
-                Utility.isMetric(mContext)) + "\u00b0";
+        return Utility.formatTemperature(context, cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP),
+                Utility.isMetric(mContext));
     }
 
     /*
@@ -53,7 +67,15 @@ public class ForecastAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.list_item_forecast, parent, false);
+        int viewType = getItemViewType(cursor.getPosition());
+        int layoutId = viewType == VIEW_TYPE_TODAY
+                ? R.layout.list_item_forecast_today
+                : R.layout.list_item_forecast;
+        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+        Log.d("TAG", "newView()");
+        return view;
     }
 
     /*
@@ -64,33 +86,38 @@ public class ForecastAdapter extends CursorAdapter {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
 
+        ViewHolder holder = (ViewHolder) view.getTag();
 
-        LinearLayout layout = (LinearLayout) view;
-        TextView date = (TextView) layout.findViewById(R.id.item_forecast_textview_date);
-        TextView forecast = (TextView) layout.findViewById(R.id.item_forecast_textview_details);
-        TextView high = (TextView) layout.findViewById(R.id.item_forecast_textview_high);
-        TextView low = (TextView) layout.findViewById(R.id.item_forecast_textview_low);
+//        LinearLayout layout = (LinearLayout) view;
+//        TextView date = (TextView) layout.findViewById(R.id.item_forecast_textview_date);
+//        TextView details = (TextView) layout.findViewById(R.id.item_forecast_textview_details);
+//        TextView high = (TextView) layout.findViewById(R.id.item_forecast_textview_high);
+//        TextView low = (TextView) layout.findViewById(R.id.item_forecast_textview_low);
 
-        String dt = formatDate(getDate(cursor));
+        String dt = Utility.formatDate(getDate(cursor));
 
-        date.setText(dt);
-        forecast.setText(getDetails(cursor));
-        high.setText(getHighs(cursor));
-        low.setText(getLows(cursor));
+        holder.date.setText(dt);
+        holder.details.setText(getDetails(cursor));
+        holder.high.setText(getHighs(cursor));
+        holder.low.setText(getLows(cursor));
     }
 
-    @NonNull
-    private String formatDate(String dt) {
-        int day = Integer.parseInt(dt.substring(4, 6));
 
-        try {
-            if (day == TODAY) dt = "Today";
-            else if (day == TODAY + 1) dt = "Tomorrow";
-            else if (day >= TODAY +2 && day <= TODAY + 6) dt = WEEK_DAY_FORMAT.format(FULL_FORMAT.parse(dt));
-        } catch (ParseException e) {
-            e.printStackTrace();
+    private static class ViewHolder {
+        ImageView image;
+        TextView date;
+        TextView details;
+        TextView high;
+        TextView low;
+
+        public ViewHolder(View view) {
+            this.image = (ImageView) view.findViewById(R.id.image);
+            this.date = (TextView) view.findViewById(R.id.item_forecast_textview_date);
+            this.details = (TextView) view.findViewById(R.id.item_forecast_textview_details);
+            this.high = (TextView) view.findViewById(R.id.item_forecast_textview_high);
+            this.low = (TextView) view.findViewById(R.id.item_forecast_textview_low);
         }
 
-        return dt;
     }
+
 }

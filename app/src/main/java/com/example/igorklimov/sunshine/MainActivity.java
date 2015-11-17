@@ -4,13 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
     private String location;
-    private static final String  FORECASTFRAGMENT_TAG = "forecast_tag";
+    private static final String FORECASTFRAGMENT_TAG = "forecast_tag";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -56,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
             fragment.getLoaderManager().restartLoader(0, null, fragment);
             location = Utility.getPreferredLocation(this);
         }
+
+        Log.d("TAG", "onResume()");
+        Utility.setToday();
     }
 
 }

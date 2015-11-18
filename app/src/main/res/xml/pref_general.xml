@@ -15,7 +15,7 @@
         android:title="Unit System"
         android:entries="@array/units_names_array"
         android:entryValues="@array/units_array"
-        android:defaultValue="2"
+        android:defaultValue="1"
         android:summary="%s"/>
 
 </PreferenceScreen>

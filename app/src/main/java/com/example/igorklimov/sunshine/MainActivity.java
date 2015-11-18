@@ -11,6 +11,7 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity {
 
     private String location;
+    static boolean unitSystemChanged = false;
     private static final String FORECASTFRAGMENT_TAG = "forecast_tag";
 
     @Override
@@ -50,15 +51,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (!location.equals(Utility.getPreferredLocation(this))) {
+        if (!location.equals(Utility.getPreferredLocation(this)) || unitSystemChanged) {
             ForecastFragment fragment = (ForecastFragment) getSupportFragmentManager()
                     .findFragmentByTag(FORECASTFRAGMENT_TAG);
-            fragment.onLocationChanged();
+            fragment.onLocationOrUnitSystemChanged();
             fragment.getLoaderManager().restartLoader(0, null, fragment);
             location = Utility.getPreferredLocation(this);
+            unitSystemChanged = false;
         }
 
-        Log.d("TAG", "onResume()");
+
+
         Utility.setToday();
     }
 

@@ -30,11 +30,9 @@ public class Utility {
 
     static String formatTemperature(Context context, double temperature, boolean isMetric) {
         double temp;
-        if (!isMetric) {
-            temp = 9 * temperature / 5 + 32;
-        } else {
-            temp = temperature;
-        }
+        if (!isMetric) temp = 9 * temperature / 5 + 32;
+        else temp = temperature;
+
         return context.getString(R.string.format_temperature, temp);
     }
 
@@ -49,17 +47,8 @@ public class Utility {
 
     @NonNull
     static String formatDate(String dt) {
-        int day = Integer.parseInt(dt.substring(4, 6));
-
-        try {
-            if (day == today) dt = "Today";
-            else if (day == today + 1) dt = "Tomorrow";
-            else if (day >= today + 2 && day <= today + 6) {
-                dt = Utility.WEEK_DAY_FORMAT.format(Utility.FULL_FORMAT.parse(dt));
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        int day = Integer.parseInt(dt.substring(4, dt.indexOf(",")));
+        if (day >= today && day <= today + 6) dt = getWeekDay(dt);
 
         return dt;
     }
@@ -83,8 +72,20 @@ public class Utility {
         return context.getString(R.string.format_humidity, pressure);
     }
 
-    public static String formatWindSpeed(Context context,double windSpeed, double degrees) {
-        return context.getString(R.string.format_wind_km, windSpeed, degrees);
+    public static String formatWind(Context context, double windSpeed, double degrees) {
+        String destination = null;
+
+        if (degrees >= 337.5 && degrees <= 360 || degrees >= 0 && degrees <= 22.5)
+            destination = "N";
+        else if (degrees > 22.5 && degrees < 67.5) destination = "NE";
+        else if (degrees >= 67.5 && degrees <= 112.5) destination = "E";
+        else if (degrees > 112.5 && degrees < 157.5) destination = "SE";
+        else if (degrees >= 157.5 && degrees <= 202.5) destination = "S";
+        else if (degrees > 202.5 && degrees < 247.5) destination = "SW";
+        else if (degrees >= 247.5 && degrees <= 292.5) destination = "W";
+        else if (degrees > 292.5 && degrees < 337.5) destination = "NW";
+
+        return context.getString(R.string.format_wind_km, windSpeed, destination);
     }
 
     public static String formatPressure(Context context, double pressure) {

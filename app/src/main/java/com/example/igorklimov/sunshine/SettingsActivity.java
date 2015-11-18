@@ -56,7 +56,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             ListPreference listPreference = (ListPreference) preference;
             int prefIndex = listPreference.findIndexOfValue(stringValue);
             if (prefIndex >= 0) preference.setSummary(listPreference.getEntries()[prefIndex]);
-
+            if(!listPreference.getValue().equals(value)) MainActivity.unitSystemChanged = true;
         } else {
             // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);

@@ -1,22 +1,19 @@
-package com.example.igorklimov.sunshine;
+package com.example.igorklimov.sunshine.helpers;
 
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.example.igorklimov.sunshine.R;
+import com.example.igorklimov.sunshine.activities.MainActivity;
+import com.example.igorklimov.sunshine.fragments.ForecastFragment;
 
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
@@ -67,14 +64,14 @@ public class ForecastAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        int viewType = getItemViewType(cursor.getPosition());
-        int layoutId = viewType == VIEW_TYPE_TODAY
-                ? R.layout.list_item_forecast_today
-                : R.layout.list_item_forecast;
+        int layoutId;
+        MainActivity con = (MainActivity) context;
+        if (isToday(cursor)&& !con.mTwoPane){ layoutId = R.layout.list_item_forecast_today;}
+        else layoutId = R.layout.list_item_forecast;
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
-        Log.d("TAG", "newView()");
+
         return view;
     }
 
@@ -85,23 +82,27 @@ public class ForecastAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
-
         ViewHolder holder = (ViewHolder) view.getTag();
-
-//        LinearLayout layout = (LinearLayout) view;
-//        TextView date = (TextView) layout.findViewById(R.id.item_forecast_textview_date);
-//        TextView details = (TextView) layout.findViewById(R.id.item_forecast_textview_details);
-//        TextView high = (TextView) layout.findViewById(R.id.item_forecast_textview_high);
-//        TextView low = (TextView) layout.findViewById(R.id.item_forecast_textview_low);
-
+        int conditionId = cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
         String dt = Utility.formatDate(getDate(cursor));
+        MainActivity con = (MainActivity) context;
 
         holder.date.setText(dt);
         holder.details.setText(getDetails(cursor));
         holder.high.setText(getHighs(cursor));
         holder.low.setText(getLows(cursor));
+        holder.image.setImageResource(
+                isToday(cursor)&& !con.mTwoPane
+                        ? Utility.getArtResourceForWeatherCondition(conditionId)
+                        : Utility.getIconResourceForWeatherCondition(conditionId)
+        );
+
     }
 
+    private boolean isToday(Cursor cursor) {
+        int viewType = getItemViewType(cursor.getPosition());
+        return viewType == VIEW_TYPE_TODAY;
+    }
 
     private static class ViewHolder {
         ImageView image;

@@ -1,4 +1,4 @@
-package com.example.igorklimov.sunshine;
+package com.example.igorklimov.sunshine.helpers;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -43,7 +43,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
      * @param lon             the longitude of the city
      * @return the row ID of the added location.
      */
-    long addLocation(String locationSetting, String cityName, double lat, double lon) {
+    public long addLocation(String locationSetting, String cityName, double lat, double lon) {
         long locationId;
 
         // First, check if the location with this city name exists in the db

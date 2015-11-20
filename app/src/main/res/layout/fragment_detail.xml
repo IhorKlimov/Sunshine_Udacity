@@ -12,7 +12,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context="com.example.igorklimov.sunshine.DetailActivity$PlaceholderFragment"
+        tools:context="com.example.igorklimov.sunshine.activities.DetailActivity$PlaceholderFragment"
         tools:showIn="@layout/activity_detail">
 
         <LinearLayout
@@ -32,7 +32,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="24sp" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -59,7 +58,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="28sp" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -68,10 +66,10 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:contentDescription="@string/descript"
-                    android:src="@drawable/ic_launcher" />
+                    android:id="@+id/details_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/descript" />
 
                 <TextView
                     android:id="@+id/details_description"
@@ -79,7 +77,6 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:textSize="24sp" />
-
             </LinearLayout>
 
         </LinearLayout>
@@ -106,7 +103,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18sp" />
-
         </LinearLayout>
 
     </LinearLayout>

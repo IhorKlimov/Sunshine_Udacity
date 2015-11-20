@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.test.AndroidTestCase;
 
 import com.example.igorklimov.sunshine.data.WeatherContract;
+import com.example.igorklimov.sunshine.helpers.FetchWeatherTask;
 
 public class TestFetchWeatherTask extends AndroidTestCase{
     static final String ADD_LOCATION_SETTING = "Sunnydale, CA";

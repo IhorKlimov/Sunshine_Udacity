@@ -1,7 +1,8 @@
-package com.example.igorklimov.sunshine;
+package com.example.igorklimov.sunshine.fragments;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -15,9 +16,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.igorklimov.sunshine.R;
+import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract;
+
+import static com.example.igorklimov.sunshine.helpers.Utility.*;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -25,7 +31,6 @@ import com.example.igorklimov.sunshine.data.WeatherContract;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
 
     private ShareActionProvider mShareActionProvider;
@@ -39,19 +44,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView hum;
     private TextView w;
     private TextView p;
+    private ImageView i;
 
     private static final int DETAIL_LOADER = 0;
 
-    private static final String[] FORECAST_COLUMNS = {
-            WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
-            WeatherContract.WeatherEntry.COLUMN_DATE,
-            WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
-            WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
-            WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
-            WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
-            WeatherContract.WeatherEntry.COLUMN_PRESSURE,
-            WeatherContract.WeatherEntry.COLUMN_DEGREES
+    private static final String[] DETAIL_COLUMNS = {
+            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+            WeatherEntry.COLUMN_DATE,
+            WeatherEntry.COLUMN_SHORT_DESC,
+            WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherEntry.COLUMN_MIN_TEMP,
+            WeatherEntry.COLUMN_HUMIDITY,
+            WeatherEntry.COLUMN_WIND_SPEED,
+            WeatherEntry.COLUMN_PRESSURE,
+            WeatherEntry.COLUMN_DEGREES,
+            WeatherEntry.COLUMN_WEATHER_ID
     };
 
     // these constants correspond to the projection defined above, and must change if the
@@ -65,6 +72,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int COL_WEATHER_WIND_SPEED = 6;
     private static final int COL_WEATHER_PRESSURE = 7;
     private static final int COL_WEATHER_DEGREES = 8;
+    private static final int COL_WEATHER_CONDITION_ID = 9;
+    public Uri mUri;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -72,7 +81,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View inflate = inflater.inflate(R.layout.fragment_activity_detail, container, false);
+        View inflate = inflater.inflate(R.layout.main, container, false);
 
         weekD = (TextView) inflate.findViewById(R.id.details_week_day);
         date = (TextView) inflate.findViewById(R.id.details_date);
@@ -82,7 +91,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         hum = (TextView) inflate.findViewById(R.id.details_humidity);
         w = (TextView) inflate.findViewById(R.id.details_wind);
         p = (TextView) inflate.findViewById(R.id.details_pressure);
-
+        i = (ImageView) inflate.findViewById(R.id.details_image);
         return inflate;
     }
 
@@ -119,13 +128,29 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "In onCreateLoader");
         Intent intent = getActivity().getIntent();
-        if (intent == null) return null;
+        if (intent == null || intent.getData() == null) {
+            Uri one = getArguments().getParcelable("one");
+            return new CursorLoader(
+                    getActivity(),
+                    one,
+                    DETAIL_COLUMNS,
+                    null,
+                    null,
+                    null);
+        } else {
 
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(getActivity(), intent.getData(), FORECAST_COLUMNS, null, null, null);
+            // Now create and return a CursorLoader that will take care of
+            // creating a Cursor for the data being displayed.
+            return new CursorLoader(
+                    getActivity(),
+                    intent.getData(),
+                    DETAIL_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
+        }
     }
 
     @Override
@@ -133,17 +158,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Log.v(LOG_TAG, "In onLoadFinished");
         if (!data.moveToFirst()) return;
 
-        boolean isMetric = Utility.isMetric(getActivity());
+        boolean isMetric = isMetric(getActivity());
 
-        String dateString = Utility.formatDate(data.getLong(COL_WEATHER_DATE));
+        String dateString = formatDate(data.getLong(COL_WEATHER_DATE));
         String weatherDescription = data.getString(COL_WEATHER_DESC);
-        String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
-        String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
-        String weekDay = Utility.getWeekDay(dateString);
-        String humidity = Utility.formatHumidity(getContext(), data.getInt(COL_WEATHER_HUMIDITY));
-        String wind = Utility.formatWind(getContext(), data.getDouble(COL_WEATHER_WIND_SPEED),
+        String high = formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
+        String low = formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
+        String weekDay = getWeekDay(dateString);
+        String humidity = formatHumidity(getContext(), data.getInt(COL_WEATHER_HUMIDITY));
+        String wind = formatWind(getContext(), data.getDouble(COL_WEATHER_WIND_SPEED),
                 data.getDouble(COL_WEATHER_DEGREES));
-        String pressure = Utility.formatPressure(getContext(), data.getDouble(COL_WEATHER_PRESSURE));
+        String pressure = formatPressure(getContext(), data.getDouble(COL_WEATHER_PRESSURE));
+        int image = getArtResourceForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID));
 
         weekD.setText(weekDay);
         date.setText(dateString.substring(0, 6));
@@ -153,6 +179,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         hum.setText(humidity);
         w.setText(wind);
         p.setText(pressure);
+        i.setImageResource(image);
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActionProvider != null) {
@@ -162,6 +189,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    public void onLocationChanged(String newLocation) {
+        // replace the uri, since the location has changed
+        Uri uri = mUri;
+        if (null != uri) {
+            long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+            Uri updatedUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            mUri = updatedUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+        }
     }
 
 }

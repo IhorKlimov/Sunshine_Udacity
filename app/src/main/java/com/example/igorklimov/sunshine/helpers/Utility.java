@@ -50,7 +50,8 @@ public class Utility {
     @NonNull
     static String formatDate(String dt) {
         int day = Integer.parseInt(dt.substring(4, dt.indexOf(",")));
-        if (day >= today && day <= today + 6) dt = getWeekDay(dt);
+        if (day == today) dt = getWeekDay(dt) + ", "+ dt.substring(0, dt.indexOf(","));
+        else if (day > today && day <= today + 6) dt = getWeekDay(dt);
 
         return dt;
     }
@@ -96,6 +97,7 @@ public class Utility {
     /**
      * Helper method to provide the icon resource id according to the weather condition id returned
      * by the OpenWeatherMap call.
+     *
      * @param weatherId from OpenWeatherMap API response
      * @return resource id for the corresponding icon. -1 if no relation is found.
      */
@@ -131,6 +133,7 @@ public class Utility {
     /**
      * Helper method to provide the art resource id according to the weather condition id returned
      * by the OpenWeatherMap call.
+     *
      * @param weatherId from OpenWeatherMap API response
      * @return resource id for the corresponding image. -1 if no relation is found.
      */

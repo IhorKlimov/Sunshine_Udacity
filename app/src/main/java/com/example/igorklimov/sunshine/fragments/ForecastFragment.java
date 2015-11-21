@@ -205,7 +205,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 null,
                 sortOrder);
     }
-d
+
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         forecastAdapter.swapCursor(cursor);

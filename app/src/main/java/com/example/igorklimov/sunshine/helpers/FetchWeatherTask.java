@@ -259,6 +259,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                     .appendQueryParameter(APPID_PARAM, "4b8f8c376695ae74fa72e622025b70c4")
                     .build();
 
+            Log.d("TAG", builtUri.toString());
+
             URL url = new URL(builtUri.toString());
 
             // Create the request to OpenWeatherMap, and open the connection

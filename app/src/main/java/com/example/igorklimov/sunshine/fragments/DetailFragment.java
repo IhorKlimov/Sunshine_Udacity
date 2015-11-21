@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -103,12 +104,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         // Retrieve the share menu item
         MenuItem menuItem = menu.findItem(R.id.menu_share);
 
+
+
         // Get the provider and hold onto it to set/change the share intent.
-//            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+        mShareActionProvider = new ShareActionProvider(getContext());
+        MenuItemCompat.setActionProvider(menuItem, mShareActionProvider);
 
         // If onLoadFinished happens before this, we can go ahead and set the share intent now.
 //            if (mForecast != null) {
-//                mShareActionProvider.setShareIntent(createShareForecastIntent());
+                mShareActionProvider.setShareIntent(createShareForecastIntent());
 //            }
     }
 
@@ -116,7 +120,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mForecast + FORECAST_SHARE_HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "hello"+ FORECAST_SHARE_HASHTAG);
         return shareIntent;
     }
 

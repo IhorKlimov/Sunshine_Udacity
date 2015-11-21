@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/sunshine_blue</item>
         <item name="colorPrimaryDark">@color/sunshine_dark_blue</item>
+        <item name="android:textColorSecondary">#FFFFFF</item>
     </style>
 
     <!-- Main activity theme. -->
@@ -28,5 +29,32 @@
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- Font Styles-->
+    <style name="Text24Condensed">
+        <item name="android:fontFamily">sans-serif-condesed</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text20Condensed">
+        <item name="android:fontFamily">sans-serif-condesed</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text96Light">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">96sp</item>
+    </style>
+
+    <style name="Text48Light">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">48sp</item>
+        <item name="android:color">#646464</item>
+    </style>
+
+    <style name="Text22Condensed">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textSize">22sp</item>
+    </style>
 
 </resources>

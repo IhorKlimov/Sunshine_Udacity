@@ -62,8 +62,7 @@
                 style="@style/Text22Condensed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="18sp" />
+                android:layout_marginTop="4dp" />
 
             <TextView
                 android:id="@+id/details_pressure"

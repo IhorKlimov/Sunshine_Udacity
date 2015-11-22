@@ -33,7 +33,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:textAppearanceSmall" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -55,7 +54,6 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:textAppearanceSmall"
             android:layout_gravity="center_horizontal"/>
-
     </LinearLayout>
 
 </LinearLayout>

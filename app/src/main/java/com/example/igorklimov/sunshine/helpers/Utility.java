@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.igorklimov.sunshine.R;
 
@@ -77,8 +78,8 @@ public class Utility {
 
     public static String formatWind(Context context, double windSpeed, double degrees) {
         String destination = null;
-
-        if (degrees >= 337.5 && degrees <= 22.5) destination = "N";
+        Log.d("TAG", degrees + "");
+        if (degrees >= 337.5 || degrees <= 22.5) destination = "N";
         else if (degrees > 22.5 && degrees < 67.5) destination = "NE";
         else if (degrees >= 67.5 && degrees <= 112.5) destination = "E";
         else if (degrees > 112.5 && degrees < 157.5) destination = "SE";
@@ -86,7 +87,7 @@ public class Utility {
         else if (degrees > 202.5 && degrees < 247.5) destination = "SW";
         else if (degrees >= 247.5 && degrees <= 292.5) destination = "W";
         else if (degrees > 292.5 && degrees < 337.5) destination = "NW";
-
+        Log.d("TAG", destination);
         return context.getString(R.string.format_wind_km, windSpeed, destination);
     }
 

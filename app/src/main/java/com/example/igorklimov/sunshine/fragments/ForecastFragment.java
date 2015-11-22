@@ -30,6 +30,7 @@ import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.helpers.Utility;
 import com.example.igorklimov.sunshine.activities.DetailActivity;
 import com.example.igorklimov.sunshine.data.WeatherContract;
+import com.example.igorklimov.sunshine.service.SunshineService;
 
 import java.io.IOException;
 import java.util.List;
@@ -161,9 +162,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
-        String location = Utility.getPreferredLocation(getActivity());
-        weatherTask.execute(location);
+        Intent fetchIntent = new Intent(getActivity(), SunshineService.class);
+        getActivity().startService(fetchIntent);
     }
 
     private String getGeoLocation() {

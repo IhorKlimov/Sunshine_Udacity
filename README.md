@@ -1,4 +1,4 @@
-An app which I'm making during Udacity - Developing Adndroid Apps course.
+    An app which I'm making during Udacity - Developing Android Apps course.
 
 I use an OpenWeatherMap API to get the forecasts. http://openweathermap.org/API
 

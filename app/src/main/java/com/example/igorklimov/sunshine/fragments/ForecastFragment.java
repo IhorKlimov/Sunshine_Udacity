@@ -1,11 +1,15 @@
 package com.example.igorklimov.sunshine.fragments;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -31,6 +35,9 @@ import com.example.igorklimov.sunshine.helpers.Utility;
 import com.example.igorklimov.sunshine.activities.DetailActivity;
 import com.example.igorklimov.sunshine.data.WeatherContract;
 import com.example.igorklimov.sunshine.service.SunshineService;
+import com.example.igorklimov.sunshine.sync.SunshineAuthenticator;
+import com.example.igorklimov.sunshine.sync.SunshineAuthenticatorService;
+import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 
 import java.io.IOException;
 import java.util.List;
@@ -117,11 +124,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // The CursorAdapter will take data from our cursor and populate the ListView.
         forecastAdapter = new ForecastAdapter(getActivity(), null, 0);
-        if (savedInstanceState != null && savedInstanceState.containsKey("position")) pos = savedInstanceState.getInt("position");
+        if (savedInstanceState != null && savedInstanceState.containsKey("position"))
+            pos = savedInstanceState.getInt("position");
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-         listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(forecastAdapter);
         mainActivity = (MainActivity) getActivity();
         updateWeather();
@@ -162,8 +170,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-        Intent fetchIntent = new Intent(getActivity(), SunshineService.class);
-        getActivity().startService(fetchIntent);
+//        AlarmManager manager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+//        Intent intent = new Intent(getActivity(), SunshineService.AlarmReceiver.class);
+//        PendingIntent broadcast = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+//        manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5 * 1000,
+//                AlarmManager.INTERVAL_FIFTEEN_MINUTES/15, broadcast);
+//
+//        Intent fetchIntent = new Intent(getActivity(), SunshineService.class);
+//        getActivity().startService(fetchIntent);
+        SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
     private String getGeoLocation() {

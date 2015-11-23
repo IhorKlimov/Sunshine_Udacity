@@ -73,6 +73,11 @@
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
+    <style name="Text86Light">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">86sp</item>
+    </style>
+
     <style name="Text96Light">
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textSize">96sp</item>

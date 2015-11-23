@@ -300,11 +300,11 @@ public class SunshineService extends IntentService {
         }
     }
 
-    static class AlarmReceiver extends BroadcastReceiver {
+    public static class AlarmReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            Log.d("TAG", "onReceive()");
         }
     }
 

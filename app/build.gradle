@@ -18,6 +18,9 @@ android {
     }
     productFlavors {
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'OPEN_WEATHER_MAP_API_KEY', '"4b8f8c376695ae74fa72e622025b70c4"'
+    }
 }
 
 dependencies {

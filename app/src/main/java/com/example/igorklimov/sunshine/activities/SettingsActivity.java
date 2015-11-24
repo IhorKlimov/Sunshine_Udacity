@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.activities.MainActivity;
+import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -61,7 +62,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             ListPreference listPreference = (ListPreference) preference;
             int prefIndex = listPreference.findIndexOfValue(stringValue);
             if (prefIndex >= 0) preference.setSummary(listPreference.getEntries()[prefIndex]);
-            if(!listPreference.getValue().equals(value)) MainActivity.unitSystemChanged = true;
+            if(!listPreference.getValue().equals(value)) SunshineSyncAdapter
+                    .syncImmediately(getApplicationContext());
         } else {
             // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);

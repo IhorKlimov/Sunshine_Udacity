@@ -16,6 +16,7 @@ import com.example.igorklimov.sunshine.fragments.DetailFragment;
 import com.example.igorklimov.sunshine.fragments.ForecastFragment;
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.helpers.Utility;
+import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 
 import static com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry.getDateFromUri;
 
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         location = Utility.getPreferredLocation(this);
         ActionBar bar = getSupportActionBar();
         if(bar!= null) bar.setElevation(0f);
-
+        SunshineSyncAdapter.initializeSyncAdapter(this);
         if (findViewById(R.id.weather_detail_container) != null) {
             // The detail container view will be present only in the large-screen layouts
             // (res/layout-sw600dp). If this view is present, then the activity should be

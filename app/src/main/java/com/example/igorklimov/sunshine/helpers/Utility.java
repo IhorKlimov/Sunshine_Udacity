@@ -28,7 +28,8 @@ public class Utility {
 
     public static boolean isMetric(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.unit_system_key), context.getString(R.string.metric)).equals("" + 1);
+        String string = prefs.getString(context.getString(R.string.unit_system_key), context.getString(R.string.metric));
+        return string.equals(context.getString(R.string.metric)) || string.equals(1 + "");
     }
 
     public static String formatTemperature(Context context, double temperature, boolean isMetric) {
@@ -51,7 +52,7 @@ public class Utility {
     @NonNull
     static String formatDate(String dt) {
         int day = Integer.parseInt(dt.substring(4, dt.indexOf(",")));
-        if (day == today) dt = getWeekDay(dt) + ", "+ dt.substring(0, dt.indexOf(","));
+        if (day == today) dt = getWeekDay(dt) + ", " + dt.substring(0, dt.indexOf(","));
         else if (day > today && day <= today + 6) dt = getWeekDay(dt);
 
         return dt;

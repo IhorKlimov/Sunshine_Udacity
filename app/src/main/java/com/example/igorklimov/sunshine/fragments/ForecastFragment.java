@@ -1,15 +1,11 @@
 package com.example.igorklimov.sunshine.fragments;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -25,18 +21,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.activities.MainActivity;
 import com.example.igorklimov.sunshine.data.WeatherContract.LocationEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
-import com.example.igorklimov.sunshine.helpers.FetchWeatherTask;
 import com.example.igorklimov.sunshine.helpers.ForecastAdapter;
-import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.helpers.Utility;
-import com.example.igorklimov.sunshine.activities.DetailActivity;
-import com.example.igorklimov.sunshine.data.WeatherContract;
 import com.example.igorklimov.sunshine.service.SunshineService;
-import com.example.igorklimov.sunshine.sync.SunshineAuthenticator;
-import com.example.igorklimov.sunshine.sync.SunshineAuthenticatorService;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 
 import java.io.IOException;

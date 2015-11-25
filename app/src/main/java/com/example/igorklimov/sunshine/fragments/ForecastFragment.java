@@ -27,7 +27,6 @@ import com.example.igorklimov.sunshine.data.WeatherContract.LocationEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
 import com.example.igorklimov.sunshine.helpers.ForecastAdapter;
 import com.example.igorklimov.sunshine.helpers.Utility;
-import com.example.igorklimov.sunshine.service.SunshineService;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 
 import java.io.IOException;

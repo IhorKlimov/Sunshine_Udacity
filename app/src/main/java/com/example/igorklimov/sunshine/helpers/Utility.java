@@ -26,6 +26,11 @@ public class Utility {
         return prefs.getString(context.getString(R.string.location_key), context.getString(R.string.location_default_value));
     }
 
+    public static boolean isNotificationOn(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.key_notifications), true);
+    }
+
     public static boolean isMetric(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String string = prefs.getString(context.getString(R.string.unit_system_key), context.getString(R.string.metric));

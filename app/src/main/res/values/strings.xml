@@ -29,4 +29,6 @@
     </string>
     <!-- Strings related to Notification preference -->
     <string name="pref_last_notification">last_notification</string>
+    <string name="key_notifications">Notifications</string>
+    <string name="title_notifications">Receive Notifications</string>
 </resources>

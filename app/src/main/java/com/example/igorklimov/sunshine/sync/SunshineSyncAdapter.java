@@ -44,6 +44,7 @@ import java.net.URL;
 import java.util.Vector;
 
 import static com.example.igorklimov.sunshine.helpers.Utility.isMetric;
+import static com.example.igorklimov.sunshine.helpers.Utility.isNotificationOn;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
@@ -151,6 +152,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private void notifyWeather() {
+        Log.d("TAG", "notifyWeather()");
         Context context = getContext();
         //checking the last update and notify if it' the first of the day
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -353,7 +355,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 inserted = context.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, cvArray);
-                notifyWeather();
+                if (isNotificationOn(context)) notifyWeather();
             }
 
 

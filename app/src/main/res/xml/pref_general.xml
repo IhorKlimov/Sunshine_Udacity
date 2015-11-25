@@ -5,17 +5,22 @@
 
     <EditTextPreference
         android:defaultValue="@string/location_default_value"
+        android:inputType="text"
         android:key="@string/location_key"
         android:singleLine="true"
-        android:inputType="text"
         android:title="@string/location_title" />
 
     <ListPreference
-        android:key="@string/unit_system_key"
-        android:title="Unit System"
+        android:defaultValue="1"
         android:entries="@array/units_names_array"
         android:entryValues="@array/units_array"
-        android:defaultValue="1"
-        android:summary="%s"/>
+        android:key="@string/unit_system_key"
+        android:summary="%s"
+        android:title="Unit System" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/key_notifications"
+        android:title="@string/title_notifications" />
 
 </PreferenceScreen>

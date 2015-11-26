@@ -24,10 +24,14 @@ public class ForecastAdapter extends CursorAdapter {
     private static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_FUTURE_DAY = 1;
 
-    private final Context context;
+    private  Context context;
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        this.context = context;
+    }
+
+    public void setContext(Context context) {
         this.context = context;
     }
 
@@ -86,7 +90,6 @@ public class ForecastAdapter extends CursorAdapter {
         int conditionId = cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
         String dt = Utility.formatDate(getDate(cursor));
         MainActivity con = (MainActivity) context;
-
         holder.date.setText(dt);
         holder.details.setText(getDetails(cursor));
         holder.high.setText(getHighs(cursor));

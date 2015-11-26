@@ -7,7 +7,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="location_title">Location</string>
     <string name="location_key">location</string>
-    <string name="location_default_value">84070</string>
+    <string name="location_default_value">Stockholm</string>
     <string name="metric">Metric</string>
     <string name="imperial">Imperial</string>
     <string name="unit_system_key">unit_system</string>

@@ -48,6 +48,13 @@ public class Utility {
         return context.getString(R.string.format_temperature, temp);
     }
 
+    public static String getForecast(Context context, double high, double low, String desc) {
+        return String.format(context.getString(R.string.format_notification),
+                desc,
+                Utility.formatTemperature(context, high, isMetric(context)),
+                Utility.formatTemperature(context, low, isMetric(context)));
+    }
+
     public static String formatDate(long dateInMillis) {
         Date date = new Date(dateInMillis);
         return DateFormat.getDateInstance().format(date);

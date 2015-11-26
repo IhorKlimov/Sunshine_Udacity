@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 import com.example.igorklimov.sunshine.data.WeatherContract;
 import com.example.igorklimov.sunshine.fragments.DetailFragment;
@@ -46,31 +47,15 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+         getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
         location = Utility.getPreferredLocation(this);
         ActionBar bar = getSupportActionBar();
-        if(bar!= null) bar.setElevation(0f);
+        if (bar != null) bar.setElevation(0f);
         SunshineSyncAdapter.initializeSyncAdapter(this);
-        if (findViewById(R.id.weather_detail_container) != null) {
-            // The detail container view will be present only in the large-screen layouts
-            // (res/layout-sw600dp). If this view is present, then the activity should be
-            // in two-pane mode.
-            mTwoPane = true;
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-//            if (savedInstanceState == null) {
-//                DetailFragment fragment = new DetailFragment();
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
-//                        .commit();
-//            }
-        } else {
-            mTwoPane = false;
-        }
-
+        mTwoPane = findViewById(R.id.weather_detail_container) != null;
     }
 
     @Override
@@ -102,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             DetailFragment newFragment = new DetailFragment();
 
             Bundle bundle = new Bundle();
-            bundle.putParcelable("one",dateUri);
+            bundle.putParcelable("one", dateUri);
             newFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.weather_detail_container, newFragment);

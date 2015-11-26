@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract;
+import com.example.igorklimov.sunshine.helpers.Utility;
 
 import static com.example.igorklimov.sunshine.helpers.Utility.*;
 
@@ -35,7 +36,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
 
     private ShareActionProvider mShareActionProvider;
-    private String mForecast;
 
     private TextView weekD;
     private TextView date;
@@ -75,6 +75,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int COL_WEATHER_DEGREES = 8;
     private static final int COL_WEATHER_CONDITION_ID = 9;
     public Uri mUri;
+    private double high;
+    private double low;
+    private String weatherDescription;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -105,22 +108,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         MenuItem menuItem = menu.findItem(R.id.menu_share);
 
 
-
         // Get the provider and hold onto it to set/change the share intent.
         mShareActionProvider = new ShareActionProvider(getContext());
         MenuItemCompat.setActionProvider(menuItem, mShareActionProvider);
 
         // If onLoadFinished happens before this, we can go ahead and set the share intent now.
-//            if (mForecast != null) {
-                mShareActionProvider.setShareIntent(createShareForecastIntent());
-//            }
+        mShareActionProvider.setShareIntent(createShareForecastIntent());
     }
 
     private Intent createShareForecastIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "hello"+ FORECAST_SHARE_HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_TEXT,
+                getForecast(getContext(), high, low, weatherDescription)
+                        + " " + FORECAST_SHARE_HASHTAG);
         return shareIntent;
     }
 
@@ -165,9 +167,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         boolean isMetric = isMetric(getActivity());
 
         String dateString = formatDate(data.getLong(COL_WEATHER_DATE));
-        String weatherDescription = data.getString(COL_WEATHER_DESC);
-        String high = formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
-        String low = formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
+        weatherDescription = data.getString(COL_WEATHER_DESC);
+        this.high = data.getDouble(COL_WEATHER_MAX_TEMP);
+        String high = formatTemperature(getContext(), this.high, isMetric);
+        this.low = data.getDouble(COL_WEATHER_MIN_TEMP);
+        String low = formatTemperature(getContext(), this.low, isMetric);
         String weekDay = getWeekDay(dateString);
         String humidity = formatHumidity(getContext(), data.getInt(COL_WEATHER_HUMIDITY));
         String wind = formatWind(getContext(), data.getDouble(COL_WEATHER_WIND_SPEED),
@@ -200,8 +204,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Uri uri = mUri;
         if (null != uri) {
             long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
-            Uri updatedUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
-            mUri = updatedUri;
+            mUri = WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
         }
     }

@@ -2,15 +2,14 @@ package com.example.igorklimov.sunshine.fragments;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -29,9 +29,6 @@ import com.example.igorklimov.sunshine.helpers.ForecastAdapter;
 import com.example.igorklimov.sunshine.helpers.Utility;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 
-import java.io.IOException;
-import java.util.List;
-
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
  */
@@ -42,6 +39,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     ListView listView;
     MainActivity mainActivity;
     private int pos = 0;
+
     private static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
             // the content provider joins the location & weather tables in the background
@@ -58,7 +56,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherEntry.COLUMN_WEATHER_ID,
             LocationEntry.COLUMN_COORD_LAT,
             LocationEntry.COLUMN_COORD_LONG,
-
     };
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
@@ -72,6 +69,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_CONDITION_ID = 6;
     public static final int COL_COORD_LAT = 7;
     public static final int COL_COORD_LONG = 8;
+    private ActionBar actionBar;
 
     public ForecastFragment() {
     }
@@ -79,7 +77,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
     }
 
@@ -121,7 +118,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         listView.setAdapter(forecastAdapter);
         mainActivity = (MainActivity) getActivity();
         updateWeather();
-
+        actionBar = ((MainActivity) getActivity()).getSupportActionBar();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -137,13 +134,28 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
 
+        if (!mainActivity.mTwoPane) {
+            listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    if (actionBar.isShowing() && firstVisibleItem > 1) actionBar.hide();
+                    if (!actionBar.isShowing() && firstVisibleItem < 2) actionBar.show();
+                }
+            });
+        }
+
         return rootView;
     }
 
     public void onLocationOrUnitSystemChanged() {
+        getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
         updateWeather();
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -166,6 +178,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //
 //        Intent fetchIntent = new Intent(getActivity(), SunshineService.class);
 //        getActivity().startService(fetchIntent);
+        Log.d("TAG", "updateWeather()");
         SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
@@ -205,6 +218,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (mainActivity.mTwoPane) {
             listView.setItemChecked(pos, true);
             listView.smoothScrollToPosition(pos);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    listView.performItemClick(
+                            listView.getAdapter().getView(pos, null, null),
+                            pos,
+                            listView.getAdapter().getItemId(pos));
+                }
+            }, 300);
         }
     }
 

@@ -48,6 +48,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Vector;
 
+import static com.example.igorklimov.sunshine.helpers.Utility.getForecast;
 import static com.example.igorklimov.sunshine.helpers.Utility.isMetric;
 import static com.example.igorklimov.sunshine.helpers.Utility.isNotificationOn;
 
@@ -186,10 +187,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 String title = context.getString(R.string.app_name);
 
                 // Define the text of the forecast.
-                String contentText = String.format(context.getString(R.string.format_notification),
-                        desc,
-                        Utility.formatTemperature(context, high, isMetric(context)),
-                        Utility.formatTemperature(context, low, isMetric(context)));
+                String contentText = getForecast(context, high, low, desc);
 
                 //build your notification here.
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
@@ -358,17 +356,16 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 cVVector.add(weatherValues);
             }
 
-            int inserted = 0;
             // add to database
             if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                inserted = context.getContentResolver().bulkInsert(
-                        WeatherEntry.CONTENT_URI, cvArray);
                 int delete = context.getContentResolver().delete(WeatherEntry.CONTENT_URI,
                         WeatherEntry.COLUMN_DATE + " <= ?",
-                        new String[]{dayTime.setJulianDay(julianStartDay-1)+""});
-                Log.d("TAG", delete + "deleted");
+                        new String[]{dayTime.setJulianDay(julianStartDay - 1) + ""});
+                context.getContentResolver().bulkInsert(
+                        WeatherEntry.CONTENT_URI, cvArray);
+                Log.d("TAG", delete + " deleted");
                 if (isNotificationOn(context)) notifyWeather();
             }
         } catch (JSONException e) {

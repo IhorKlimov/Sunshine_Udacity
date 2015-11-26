@@ -19,11 +19,13 @@ public class Utility {
     static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d", Locale.US);
     static final SimpleDateFormat WEEK_DAY_FORMAT = new SimpleDateFormat("EEEE", Locale.US);
     static final SimpleDateFormat FULL_FORMAT = new SimpleDateFormat("MMM d, yyyy", Locale.US);
-    private static int today = Integer.parseInt(Utility.DATE_FORMAT.format(new Date(System.currentTimeMillis())));
+    private static int today = Integer.parseInt(Utility.DATE_FORMAT
+            .format(new Date(System.currentTimeMillis())));
 
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.location_key), context.getString(R.string.location_default_value));
+        return prefs.getString(context.getString(R.string.location_key),
+                context.getString(R.string.location_default_value));
     }
 
     public static boolean isNotificationOn(Context context) {
@@ -37,7 +39,8 @@ public class Utility {
         return string.equals(context.getString(R.string.metric)) || string.equals(1 + "");
     }
 
-    public static String formatTemperature(Context context, double temperature, boolean isMetric) {
+    public static String formatTemperature(Context context, double temperature,
+                                           boolean isMetric) {
         double temp;
         if (!isMetric) temp = 9 * temperature / 5 + 32;
         else temp = temperature;

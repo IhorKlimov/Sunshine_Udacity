@@ -95,11 +95,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_refresh:
-                updateWeather();
-                return true;
             case R.id.action_location:
                 Uri geoLocation = Uri.parse(getGeoLocation());
+                Log.d("TAG", geoLocation.toString());
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(geoLocation);
                 if (intent.resolveActivity(getContext().getPackageManager()) != null) {
@@ -173,25 +171,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private String getGeoLocation() {
         String msg = "";
-        try {
-            Geocoder geocoder = new Geocoder(getActivity());
-            String zip = getLocationZipCode();
-            List<Address> addresses = geocoder.getFromLocationName(zip + ",se", 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address ad = addresses.get(0);
-                msg = String.format("geo:%f,%f", ad.getLatitude(), ad.getLongitude());
-                Log.i("TAG", msg);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        Cursor cursor = forecastAdapter.getCursor();
+        if (cursor.moveToFirst()) {
+            String latitude = cursor.getString(COL_COORD_LAT);
+            String longitude = cursor.getString(COL_COORD_LONG);
+            Log.d("TAG", latitude);
+            Log.d("TAG", longitude);
+            msg = String.format("geo:%s,%s", latitude, longitude);
         }
         return msg;
-    }
-
-    private String getLocationZipCode() {
-        return PreferenceManager
-                .getDefaultSharedPreferences(getActivity())
-                .getString(getString(R.string.location_key), "");
     }
 
     @Override

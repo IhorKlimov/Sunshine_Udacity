@@ -44,14 +44,6 @@ public class ForecastAdapter extends CursorAdapter {
         return 2;
     }
 
-    private String getDate(Cursor cursor) {
-        return Utility.formatDate(cursor.getLong(ForecastFragment.COL_WEATHER_DATE));
-    }
-
-    private String getDetails(Cursor cursor) {
-        return cursor.getString(ForecastFragment.COL_WEATHER_DESC);
-    }
-
     private String getHighs(Cursor cursor) {
         return Utility.formatTemperature(context, cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP),
                 Utility.isMetric(mContext));
@@ -87,10 +79,10 @@ public class ForecastAdapter extends CursorAdapter {
         // we'll keep the UI functional with a simple (and slow!) binding.
         ViewHolder holder = (ViewHolder) view.getTag();
         int conditionId = cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
-        String dt = Utility.formatDate(getDate(cursor));
+        String dt = Utility.getCalendarDate(cursor, context);
         MainActivity con = (MainActivity) context;
         holder.date.setText(dt);
-        holder.details.setText(getDetails(cursor));
+        holder.details.setText(Utility.getDescription(cursor,context));
         holder.high.setText(getHighs(cursor));
         holder.low.setText(getLows(cursor));
         holder.image.setImageResource(

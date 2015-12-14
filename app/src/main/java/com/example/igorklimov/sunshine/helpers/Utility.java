@@ -2,25 +2,31 @@ package com.example.igorklimov.sunshine.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.igorklimov.sunshine.R;
+import com.example.igorklimov.sunshine.data.WeatherContract;
+import com.example.igorklimov.sunshine.fragments.ForecastFragment;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter.LocationStatus;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry.COLUMN_SHORT_DESC;
 
 public class Utility {
 
     static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d", Locale.US);
-    static final SimpleDateFormat WEEK_DAY_FORMAT = new SimpleDateFormat("EEEE", Locale.US);
-    static final SimpleDateFormat FULL_FORMAT = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+    static final SimpleDateFormat WEEK_DAY_FORMAT = new SimpleDateFormat("EEEE", Locale.getDefault());
+    static final SimpleDateFormat FULL_FORMAT = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
     private static int today = Integer.parseInt(Utility.DATE_FORMAT
             .format(new Date(System.currentTimeMillis())));
 
@@ -57,9 +63,10 @@ public class Utility {
                 Utility.formatTemperature(context, low, isMetric(context)));
     }
 
-    public static String formatDate(long dateInMillis) {
-        Date date = new Date(dateInMillis);
-        return DateFormat.getDateInstance().format(date);
+    public static Calendar getCalendarDate(long dateInMillis) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(dateInMillis);
+        return cal;
     }
 
     public static void setToday() {
@@ -84,26 +91,32 @@ public class Utility {
                 .getInt(context.getString(R.string.location_status_key), SunshineSyncAdapter.LOCATION_STATUS_OK);
     }
 
-    @NonNull
-    static String formatDate(String dt) {
-        int day = Integer.parseInt(dt.substring(4, dt.indexOf(",")));
-        if (day == today) dt = getWeekDay(dt) + ", " + dt.substring(0, dt.indexOf(","));
-        else if (day > today && day <= today + 6) dt = getWeekDay(dt);
+    static String getCalendarDate(Cursor cursor, Context c) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(cursor.getLong(ForecastFragment.COL_WEATHER_DATE));
 
-        return dt;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        String res;
+        if (day == today) {
+            res = getWeekDay(cal, c) + ", "
+                    + cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+                    + " " + day;
+        } else if (day > today && day <= today + 6) {
+            res = getWeekDay(cal, c);
+        } else {
+            res = FULL_FORMAT.format(cal.getTime());
+        }
+
+        return res;
     }
 
-    public static String getWeekDay(String date) {
-        int day = Integer.parseInt(date.substring(4, date.indexOf(",")));
-        String result = null;
+    public static String getWeekDay(Calendar date, Context c) {
+        int day = date.get(Calendar.DAY_OF_MONTH);
+        String result;
 
-        try {
-            if (day == today) result = "Today";
-            else if (day == today + 1) result = "Tomorrow";
-            else result = WEEK_DAY_FORMAT.format(FULL_FORMAT.parseObject(date));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        if (day == today) result = c.getString(R.string.today);
+        else if (day == today + 1) result = c.getString(R.string.tomorrow);
+        else result = WEEK_DAY_FORMAT.format(date.getTime());
 
         return result;
     }
@@ -112,19 +125,18 @@ public class Utility {
         return context.getString(R.string.format_humidity, pressure);
     }
 
-    public static String formatWind(Context context, double windSpeed, double degrees) {
+    public static String formatWind(Context c, double windSpeed, double degrees) {
         String destination = null;
         Log.d("TAG", degrees + "");
-        if (degrees >= 337.5 || degrees <= 22.5) destination = "N";
-        else if (degrees > 22.5 && degrees < 67.5) destination = "NE";
-        else if (degrees >= 67.5 && degrees <= 112.5) destination = "E";
-        else if (degrees > 112.5 && degrees < 157.5) destination = "SE";
-        else if (degrees >= 157.5 && degrees <= 202.5) destination = "S";
-        else if (degrees > 202.5 && degrees < 247.5) destination = "SW";
-        else if (degrees >= 247.5 && degrees <= 292.5) destination = "W";
-        else if (degrees > 292.5 && degrees < 337.5) destination = "NW";
-        Log.d("TAG", destination);
-        return context.getString(R.string.format_wind_km, windSpeed, destination);
+        if (degrees >= 337.5 || degrees <= 22.5) destination = c.getString(R.string.n);
+        else if (degrees > 22.5 && degrees < 67.5) destination = c.getString(R.string.ne);
+        else if (degrees >= 67.5 && degrees <= 112.5) destination = c.getString(R.string.e);
+        else if (degrees > 112.5 && degrees < 157.5) destination = c.getString(R.string.se);
+        else if (degrees >= 157.5 && degrees <= 202.5) destination = c.getString(R.string.s);
+        else if (degrees > 202.5 && degrees < 247.5) destination = c.getString(R.string.sw);
+        else if (degrees >= 247.5 && degrees <= 292.5) destination = c.getString(R.string.w);
+        else if (degrees > 292.5 && degrees < 337.5) destination = c.getString(R.string.nw);
+        return c.getString(R.string.format_wind_km, windSpeed, destination);
     }
 
     public static String formatPressure(Context context, double pressure) {
@@ -203,4 +215,20 @@ public class Utility {
         return -1;
     }
 
+    public static String getDescription(Cursor data, Context c) {
+        String d = data.getString(data.getColumnIndex(COLUMN_SHORT_DESC));
+        if (d.equals("Thunderstorm")) {
+            d = c.getString(R.string.thunderstorm);
+        } else if (d.equals("Rain")) {
+            d = c.getString(R.string.rain);
+        } else if (d.equals("Snow")) {
+            d = c.getString(R.string.snow);
+        } else if (d.equals("Clear")) {
+            d = c.getString(R.string.clear);
+        } else if (d.equals("Clouds")) {
+            d = c.getString(R.string.clouds);
+        }
+
+        return d;
+    }
 }

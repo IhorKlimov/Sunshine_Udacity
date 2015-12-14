@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="http://schemas.android.com/tools">
+
+    <string name="today">Сегодня</string>
+    <string name="tomorrow">завтра</string>
+    <string name="thunderstorm">Шторм</string>
+    <string name="rain">Дождь</string>
+    <string name="snow">Снег</string>
+    <string name="clear">Ясно</string>
+    <string name="clouds">Облачно</string>
+
+    <string name="n">С</string>
+    <string name="ne">СВ</string>
+    <string name="e">В</string>
+    <string name="se">ЮВ</string>
+    <string name="s">Ю</string>
+    <string name="sw">ЮЗ</string>
+    <string name="w">З</string>
+    <string name="nw">СЗ</string>
+
+
+    <string name="format_notification">
+    Forecast: <xliff:g id="condition">%1$s</xliff:g> Выс: <xliff:g id="high">%2$s</xliff:g> Низк: <xliff:g id="low">%3$s</xliff:g>
+        </string>
+    <string name="format_humidity"><xliff:g id="humidity">Влажность: %d</xliff:g>%%</string>
+    <string name="format_wind_km"><xliff:g id="speed">Ветер: %1.0f км/ч </xliff:g><xliff:g id="destination">%2$s</xliff:g> </string>
+    <string name="format_pressure"><xliff:g id="pressure">Давление: %1.0f</xliff:g> Па</string>
+
+</resources>

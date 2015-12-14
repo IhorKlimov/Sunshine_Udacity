@@ -1,5 +1,6 @@
 package com.example.igorklimov.sunshine.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -24,6 +25,9 @@ import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract;
 import com.example.igorklimov.sunshine.helpers.Utility;
+
+import java.util.Calendar;
+import java.util.Locale;
 
 import static com.example.igorklimov.sunshine.helpers.Utility.*;
 
@@ -165,22 +169,25 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (!data.moveToFirst()) return;
 
         boolean isMetric = isMetric(getActivity());
+        Calendar calendarDate = getCalendarDate(data.getLong(COL_WEATHER_DATE));
 
-        String dateString = formatDate(data.getLong(COL_WEATHER_DATE));
-        weatherDescription = data.getString(COL_WEATHER_DESC);
+        weatherDescription = Utility.getDescription(data,getContext());
         this.high = data.getDouble(COL_WEATHER_MAX_TEMP);
-        String high = formatTemperature(getContext(), this.high, isMetric);
+        Context context = getContext();
+        String high = formatTemperature(context, this.high, isMetric);
         this.low = data.getDouble(COL_WEATHER_MIN_TEMP);
-        String low = formatTemperature(getContext(), this.low, isMetric);
-        String weekDay = getWeekDay(dateString);
-        String humidity = formatHumidity(getContext(), data.getInt(COL_WEATHER_HUMIDITY));
-        String wind = formatWind(getContext(), data.getDouble(COL_WEATHER_WIND_SPEED),
+        String low = formatTemperature(context, this.low, isMetric);
+        String weekDay = getWeekDay(calendarDate, context);
+        String humidity = formatHumidity(context, data.getInt(COL_WEATHER_HUMIDITY));
+        String wind = formatWind(context, data.getDouble(COL_WEATHER_WIND_SPEED),
                 data.getDouble(COL_WEATHER_DEGREES));
-        String pressure = formatPressure(getContext(), data.getDouble(COL_WEATHER_PRESSURE));
+        String pressure = formatPressure(context, data.getDouble(COL_WEATHER_PRESSURE));
         int image = getArtResourceForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID));
 
         weekD.setText(weekDay);
-        date.setText(dateString.substring(0, 6));
+        String text = calendarDate.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()) +
+                " " + calendarDate.get(Calendar.DAY_OF_MONTH);
+        date.setText(text);
         h.setText(high);
         l.setText(low);
         d.setText(weatherDescription);

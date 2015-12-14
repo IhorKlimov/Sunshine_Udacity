@@ -4,7 +4,6 @@ package com.example.igorklimov.sunshine.helpers;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +69,7 @@ public class ForecastAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int layoutId;
         MainActivity con = (MainActivity) context;
-        if (isToday(cursor)&& !con.mTwoPane){ layoutId = R.layout.list_item_forecast_today;}
+        if (isToday(cursor)&& !con.isTablet){ layoutId = R.layout.list_item_forecast_today;}
         else layoutId = R.layout.list_item_forecast;
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
@@ -95,7 +94,7 @@ public class ForecastAdapter extends CursorAdapter {
         holder.high.setText(getHighs(cursor));
         holder.low.setText(getLows(cursor));
         holder.image.setImageResource(
-                isToday(cursor)&& !con.mTwoPane
+                isToday(cursor)&& !con.isTablet
                         ? Utility.getArtResourceForWeatherCondition(conditionId)
                         : Utility.getIconResourceForWeatherCondition(conditionId)
         );

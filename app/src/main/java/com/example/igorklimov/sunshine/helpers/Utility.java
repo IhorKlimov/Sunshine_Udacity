@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.igorklimov.sunshine.R;
+import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
+import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter.LocationStatus;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -62,6 +64,24 @@ public class Utility {
 
     public static void setToday() {
         today = Integer.parseInt(Utility.DATE_FORMAT.format(new Date(System.currentTimeMillis())));
+    }
+
+    public static void setLocationStatusPreference(@LocationStatus int status, Context context) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putInt(context.getString(R.string.location_status_key), status).commit();
+    }
+
+    public static void resetLocationPreference(Context context) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putInt(context.getString(R.string.location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN)
+                .apply();
+    }
+
+    @SuppressWarnings("ResourceType")
+    @LocationStatus
+    public static int getLocationStatusPreference(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(context.getString(R.string.location_status_key), SunshineSyncAdapter.LOCATION_STATUS_OK);
     }
 
     @NonNull

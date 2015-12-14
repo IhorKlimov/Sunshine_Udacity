@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.igorklimov.sunshine.data.WeatherContract.LocationEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
@@ -216,19 +217,14 @@ public class WeatherProvider extends ContentProvider {
             case WEATHER: {
                 normalizeDate(values);
                 long _id = db.insert(WeatherEntry.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = WeatherEntry.buildWeatherUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                if (_id > 0) returnUri = WeatherEntry.buildWeatherUri(_id);
+                else throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
             case LOCATION:
                 long insert = db.insert(LocationEntry.TABLE_NAME, null, values);
-                if (insert > 0) {
-                    returnUri = LocationEntry.buildLocationUri(insert);
-                } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                }
+                if (insert > 0) returnUri = LocationEntry.buildLocationUri(insert);
+                else throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -238,7 +234,7 @@ public class WeatherProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         // Student: Start by getting a writable database
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         // Student: Use the uriMatcher to match the WEATHER and LOCATION URI's we are going to
@@ -306,7 +302,7 @@ public class WeatherProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {

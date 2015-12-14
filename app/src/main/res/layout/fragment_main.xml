@@ -6,9 +6,18 @@
 
     <ListView
         android:id="@+id/listview_forecast"
+        style="@style/list_style"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        style="@style/list_style">
-    </ListView>
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/not_available"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin" />
 
 </FrameLayout>

@@ -3,31 +3,24 @@ package com.example.igorklimov.sunshine.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
-import com.example.igorklimov.sunshine.data.WeatherContract;
 import com.example.igorklimov.sunshine.fragments.DetailFragment;
 import com.example.igorklimov.sunshine.fragments.ForecastFragment;
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.helpers.Utility;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 
-import static com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry.getDateFromUri;
-
 public class MainActivity extends AppCompatActivity implements ForecastFragment.Callback {
 
     private String location;
-    public boolean mTwoPane;
-    static boolean unitSystemChanged = false;
+    public boolean isTablet;
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
-    private int position = 0;
 
 
     @Override
@@ -47,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-         getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -55,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         ActionBar bar = getSupportActionBar();
         if (bar != null) bar.setElevation(0f);
         SunshineSyncAdapter.initializeSyncAdapter(this);
-        mTwoPane = findViewById(R.id.weather_detail_container) != null;
+        isTablet = findViewById(R.id.weather_detail_container) != null;
     }
 
     @Override
@@ -66,35 +59,27 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         // update the location in our second pane using the fragment manager
         if (location != null && !location.equals(this.location)) {
             ForecastFragment ff = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
-            if (null != ff) {
-                ff.onLocationOrUnitSystemChanged();
-            }
+            if (null != ff) ff.onLocationOrUnitSystemChanged();
             DetailFragment df = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
-            if (null != df) {
-                df.onLocationChanged(location);
-            }
+            if (null != df) df.onLocationChanged(location);
             this.location = location;
         }
     }
 
     @Override
     public void onItemSelected(Uri dateUri) {
-
-        if (!mTwoPane) {
+        if (!isTablet) {
             Intent intent = new Intent(this, DetailActivity.class).setData(dateUri);
             startActivity(intent);
         } else {
             DetailFragment newFragment = new DetailFragment();
-
             Bundle bundle = new Bundle();
             bundle.putParcelable("one", dateUri);
             newFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.weather_detail_container, newFragment);
+            transaction.replace(R.id.weather_detail_container, newFragment, DETAILFRAGMENT_TAG);
             transaction.addToBackStack(null);
             transaction.commit();
         }
-
     }
-
 }

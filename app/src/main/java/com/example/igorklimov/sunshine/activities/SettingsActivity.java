@@ -128,6 +128,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(context.getString(R.string.location_status_key))) {
             pref.setSummary(getSummary(Utility.getPreferredLocation(context)));
+        }else if (key.equals(context.getString(R.string.icons_key))) {
+            Log.d("TAG", "onSharedPreferenceChanged: icon style changed");
+            MainActivity.iconStyleChanged = true;
         }
     }
 }

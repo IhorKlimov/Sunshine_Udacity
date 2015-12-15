@@ -7,12 +7,14 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.data.WeatherContract;
 import com.example.igorklimov.sunshine.fragments.ForecastFragment;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter.LocationStatus;
 
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -215,18 +217,84 @@ public class Utility {
         return -1;
     }
 
+    public static String getArtUrlForWeatherCondition(int weatherId, Context c) {
+        String is = PreferenceManager.getDefaultSharedPreferences(c).getString(c.getString(R.string.icons_key), "");
+        // Based on weather code data found at:
+        // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
+        if (weatherId >= 200 && weatherId <= 232) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_storm.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_storm.png";
+        } else if (weatherId >= 300 && weatherId <= 321) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_light_rain.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_light_rain.png";
+        } else if (weatherId >= 500 && weatherId <= 504) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_rain.png";
+        } else if (weatherId == 511) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_snow.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_snow.png";
+        } else if (weatherId >= 520 && weatherId <= 531) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_rain.png";
+        } else if (weatherId >= 600 && weatherId <= 622) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_rain.png";
+        } else if (weatherId >= 701 && weatherId <= 761) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_fog.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_fog.png";
+        } else if (weatherId == 761 || weatherId == 781) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_storm.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_storm.png";
+        } else if (weatherId == 800) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_clear.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_clear.png";
+        } else if (weatherId == 801) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_light_clouds.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_light_clouds.png";
+        } else if (weatherId >= 802 && weatherId <= 804) {
+            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_clouds.png"
+                    : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_clouds.png";
+        }
+        return "";
+    }
+
+    public static int getSize(Context context, boolean big) {
+        int newSize = 0;
+        float density = context.getResources().getDisplayMetrics().density;
+        Log.d("TAG", "onLoadFinished: " + density);
+        if (big) {
+            if (density == 1.0f) newSize = 144;
+            else if (density == 1.5f) newSize = 216;
+            else if (density == 2.0f) newSize = 288;
+            else if (density >= 3.0f) newSize = 432;
+            return newSize;
+        } else {
+            if (density == 1.0f) newSize = 32;
+            else if (density == 1.5f) newSize = 48;
+            else if (density == 2.0f) newSize = 64;
+            else if (density >= 3.0f) newSize = 96;
+            return newSize;
+        }
+    }
+
     public static String getDescription(Cursor data, Context c) {
         String d = data.getString(data.getColumnIndex(COLUMN_SHORT_DESC));
-        if (d.equals("Thunderstorm")) {
-            d = c.getString(R.string.thunderstorm);
-        } else if (d.equals("Rain")) {
-            d = c.getString(R.string.rain);
-        } else if (d.equals("Snow")) {
-            d = c.getString(R.string.snow);
-        } else if (d.equals("Clear")) {
-            d = c.getString(R.string.clear);
-        } else if (d.equals("Clouds")) {
-            d = c.getString(R.string.clouds);
+        switch (d) {
+            case "Thunderstorm":
+                d = c.getString(R.string.thunderstorm);
+                break;
+            case "Rain":
+                d = c.getString(R.string.rain);
+                break;
+            case "Snow":
+                d = c.getString(R.string.snow);
+                break;
+            case "Clear":
+                d = c.getString(R.string.clear);
+                break;
+            case "Clouds":
+                d = c.getString(R.string.clouds);
+                break;
         }
 
         return d;

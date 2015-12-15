@@ -15,6 +15,8 @@
     <string name="action_location">Location</string>
     <string name="title_menu_share">Share</string>
     <string name="descript">Weather Image</string>
+    <string name="colored">Colored</string>
+    <string name="mono">Mono</string>
 
 
     <string name="format_temperature"><xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
@@ -65,5 +67,7 @@
     <string name="w">W</string>
     <string name="nw">NW</string>
 
+    <string name="url">Url</string>
+    <string name="icons_key">icons_key</string>
 
 </resources>

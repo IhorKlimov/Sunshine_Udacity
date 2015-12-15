@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.activities.MainActivity;
 import com.example.igorklimov.sunshine.fragments.ForecastFragment;
@@ -23,7 +24,7 @@ public class ForecastAdapter extends CursorAdapter {
     private static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_FUTURE_DAY = 1;
 
-    private  Context context;
+    private Context context;
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -61,8 +62,9 @@ public class ForecastAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int layoutId;
         MainActivity con = (MainActivity) context;
-        if (isToday(cursor)&& !con.isTablet){ layoutId = R.layout.list_item_forecast_today;}
-        else layoutId = R.layout.list_item_forecast;
+        if (isToday(cursor) && !con.isTablet) {
+            layoutId = R.layout.list_item_forecast_today;
+        } else layoutId = R.layout.list_item_forecast;
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
@@ -82,14 +84,20 @@ public class ForecastAdapter extends CursorAdapter {
         String dt = Utility.getCalendarDate(cursor, context);
         MainActivity con = (MainActivity) context;
         holder.date.setText(dt);
-        holder.details.setText(Utility.getDescription(cursor,context));
+        holder.details.setText(Utility.getDescription(cursor, context));
         holder.high.setText(getHighs(cursor));
         holder.low.setText(getLows(cursor));
-        holder.image.setImageResource(
-                isToday(cursor)&& !con.isTablet
-                        ? Utility.getArtResourceForWeatherCondition(conditionId)
-                        : Utility.getIconResourceForWeatherCondition(conditionId)
-        );
+
+        String pic = Utility.getArtUrlForWeatherCondition(conditionId, context);
+        int newSize = 0;
+        if (isToday(cursor) && !con.isTablet) {
+            newSize = Utility.getSize(context, true);
+        } else {
+            newSize = Utility.getSize(context, false);
+        }
+        holder.image.setMinimumHeight(newSize);
+        holder.image.setMinimumWidth(newSize);
+        Glide.with(context).load(pic).override(newSize, newSize).into(holder.image);
 
     }
 

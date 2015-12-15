@@ -6,11 +6,11 @@
 
     <com.example.igorklimov.sunshine.helpers.LocationEditTextPreference
         android:defaultValue="@string/location_default_value"
-        custom:minimumLength="3"
         android:inputType="text"
         android:key="@string/location_key"
         android:singleLine="true"
-        android:title="@string/location_title" />
+        android:title="@string/location_title"
+        custom:minimumLength="3" />
 
     <ListPreference
         android:defaultValue="1"
@@ -19,6 +19,14 @@
         android:key="@string/unit_system_key"
         android:summary="%s"
         android:title="Unit System" />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/icons_names_array"
+        android:entryValues="@array/icons_array"
+        android:key="@string/icons_key"
+        android:summary="%s"
+        android:title="Icon Style" />
 
     <CheckBoxPreference
         android:defaultValue="true"

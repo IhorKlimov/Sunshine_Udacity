@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
 
     private String location;
     public boolean isTablet;
+    public static boolean iconStyleChanged;
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
 
 
@@ -57,12 +59,15 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         Utility.setToday();
         String location = Utility.getPreferredLocation(this);
         // update the location in our second pane using the fragment manager
+        ForecastFragment ff = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
         if (location != null && !location.equals(this.location)) {
-            ForecastFragment ff = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
             if (null != ff) ff.onLocationOrUnitSystemChanged();
             DetailFragment df = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
             if (null != df) df.onLocationChanged(location);
             this.location = location;
+        } else if (iconStyleChanged) {
+            if (null != ff) ff.onLocationOrUnitSystemChanged();
+            iconStyleChanged = false;
         }
     }
 

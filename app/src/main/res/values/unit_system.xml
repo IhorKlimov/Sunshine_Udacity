@@ -11,4 +11,13 @@
         <item>@string/imperial</item>
     </string-array>
 
+    <string-array name="icons_array">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="icons_names_array">
+        <item>@string/colored</item>
+        <item>@string/mono</item>
+    </string-array>
 </resources>

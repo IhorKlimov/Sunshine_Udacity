@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
 import com.example.igorklimov.sunshine.BuildConfig;
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.activities.MainActivity;
@@ -45,6 +47,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
 import static com.example.igorklimov.sunshine.helpers.Utility.getForecast;
 import static com.example.igorklimov.sunshine.helpers.Utility.isNotificationOn;
@@ -437,15 +440,25 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 double low = cursor.getDouble(INDEX_MIN_TEMP);
                 String desc = cursor.getString(INDEX_SHORT_DESC);
 
-                int iconId = Utility.getIconResourceForWeatherCondition(weatherId);
+//                int iconId = Utility.getIconResourceForWeatherCondition(weatherId);
                 String title = context.getString(R.string.app_name);
 
                 // Define the text of the forecast.
                 String contentText = getForecast(context, high, low, desc);
 
+                String url = Utility.getArtUrlForWeatherCondition(weatherId, context);
                 //build your notification here.
+                Bitmap bitmap = null;
+                try {
+                    bitmap = Glide.with(context).load(url).asBitmap()
+                            .into(R.dimen.notification_large_icon_default, R.dimen.notification_large_icon_default)
+                            .get();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                        .setSmallIcon(iconId)
+//                        .setSmallIcon(iconId)
+                        .setLargeIcon(bitmap)
                         .setContentTitle(title)
                         .setContentText(contentText);
                 Intent intent = new Intent(context, MainActivity.class);
@@ -466,7 +479,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             if (cursor != null) cursor.close();
         }
-
     }
 
     public static void initializeSyncAdapter(Context context) {

@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract;
@@ -171,7 +172,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         boolean isMetric = isMetric(getActivity());
         Calendar calendarDate = getCalendarDate(data.getLong(COL_WEATHER_DATE));
 
-        weatherDescription = Utility.getDescription(data,getContext());
+        weatherDescription = Utility.getDescription(data, getContext());
         this.high = data.getDouble(COL_WEATHER_MAX_TEMP);
         Context context = getContext();
         String high = formatTemperature(context, this.high, isMetric);
@@ -182,7 +183,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         String wind = formatWind(context, data.getDouble(COL_WEATHER_WIND_SPEED),
                 data.getDouble(COL_WEATHER_DEGREES));
         String pressure = formatPressure(context, data.getDouble(COL_WEATHER_PRESSURE));
-        int image = getArtResourceForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID));
+        String image = Utility.getArtUrlForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID),context);
 
         weekD.setText(weekDay);
         String text = calendarDate.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()) +
@@ -194,7 +195,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         hum.setText(humidity);
         w.setText(wind);
         p.setText(pressure);
-        i.setImageResource(image);
+
+        int newSize = Utility.getSize(context, true);
+
+        Glide.with(context).load(image).override(newSize, newSize).into(i);
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActionProvider != null) {

@@ -16,6 +16,7 @@ import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -446,18 +447,24 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 // Define the text of the forecast.
                 String contentText = getForecast(context, high, low, desc);
 
-                String url = Utility.getArtUrlForWeatherCondition(weatherId, context);
-                //build your notification here.
-                Bitmap bitmap = null;
-                try {
-                    bitmap = Glide.with(context).load(url).asBitmap()
-                            .into(R.dimen.notification_large_icon_default, R.dimen.notification_large_icon_default)
-                            .get();
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                Bitmap bitmap;
+                if (!Utility.getIconStyle(context).equals("1")) {
+                    String url = Utility.getArtUrlForWeatherCondition(weatherId, context);
+                    bitmap = null;
+                    try {
+                        bitmap = Glide.with(context).load(url).asBitmap()
+                                .into(R.dimen.notification_large_icon_default, R.dimen.notification_large_icon_default)
+                                .get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    bitmap = BitmapFactory.decodeResource(context.getResources(),
+                            Utility.getArtResourceForWeatherCondition(weatherId));
                 }
+
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-//                        .setSmallIcon(iconId)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setLargeIcon(bitmap)
                         .setContentTitle(title)
                         .setContentText(contentText);

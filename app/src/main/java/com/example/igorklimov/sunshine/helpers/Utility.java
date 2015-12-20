@@ -54,7 +54,7 @@ public class Utility {
         double temp;
         if (!isMetric) temp = 9 * temperature / 5 + 32;
         else temp = temperature;
-
+        if (temp > -1 && temp < 0) temp = 0;
         return context.getString(R.string.format_temperature, temp);
     }
 
@@ -218,50 +218,54 @@ public class Utility {
     }
 
     public static String getArtUrlForWeatherCondition(int weatherId, Context c) {
-        String is = PreferenceManager.getDefaultSharedPreferences(c).getString(c.getString(R.string.icons_key), "");
+        String is = getIconStyle(c);
         // Based on weather code data found at:
         // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
         if (weatherId >= 200 && weatherId <= 232) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_storm.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_storm.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_storm.png";
         } else if (weatherId >= 300 && weatherId <= 321) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_light_rain.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_light_rain.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_light_rain.png";
         } else if (weatherId >= 500 && weatherId <= 504) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_rain.png";
         } else if (weatherId == 511) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_snow.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_snow.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_snow.png";
         } else if (weatherId >= 520 && weatherId <= 531) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_rain.png";
         } else if (weatherId >= 600 && weatherId <= 622) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_rain.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_rain.png";
         } else if (weatherId >= 701 && weatherId <= 761) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_fog.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_fog.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_fog.png";
         } else if (weatherId == 761 || weatherId == 781) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_storm.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_storm.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_storm.png";
         } else if (weatherId == 800) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_clear.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_clear.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_clear.png";
         } else if (weatherId == 801) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_light_clouds.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_light_clouds.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_light_clouds.png";
         } else if (weatherId >= 802 && weatherId <= 804) {
-            return is.equals("1") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_clouds.png"
+            return is.equals("2") ? "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Colored/art_clouds.png"
                     : "https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive/Mono/art_clouds.png";
         }
         return "";
     }
 
+    @NonNull
+    public static String getIconStyle(Context c) {
+        return PreferenceManager.getDefaultSharedPreferences(c).getString(c.getString(R.string.icons_key), "");
+    }
+
     public static int getSize(Context context, boolean big) {
         int newSize = 0;
         float density = context.getResources().getDisplayMetrics().density;
-        Log.d("TAG", "onLoadFinished: " + density);
         if (big) {
             if (density == 1.0f) newSize = 144;
             else if (density == 1.5f) newSize = 216;

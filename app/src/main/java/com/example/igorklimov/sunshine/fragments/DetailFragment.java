@@ -10,7 +10,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,11 +21,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.util.Util;
 import com.example.igorklimov.sunshine.R;
+import com.example.igorklimov.sunshine.activities.DetailActivity;
 import com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry;
 import com.example.igorklimov.sunshine.data.WeatherContract;
 import com.example.igorklimov.sunshine.helpers.Utility;
@@ -42,7 +48,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private ShareActionProvider mShareActionProvider;
 
-    private TextView weekD;
     private TextView date;
     private TextView h;
     private TextView l;
@@ -85,40 +90,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String weatherDescription;
 
     public DetailFragment() {
-        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View inflate = inflater.inflate(R.layout.main, container, false);
+        View inflate = inflater.inflate(R.layout.fragment_detail_start, container, false);
 
-        weekD = (TextView) inflate.findViewById(R.id.details_week_day);
-        date = (TextView) inflate.findViewById(R.id.details_date);
-        h = (TextView) inflate.findViewById(R.id.details_high);
-        l = (TextView) inflate.findViewById(R.id.details_low);
-        d = (TextView) inflate.findViewById(R.id.details_description);
-        hum = (TextView) inflate.findViewById(R.id.details_humidity);
-        w = (TextView) inflate.findViewById(R.id.details_wind);
-        p = (TextView) inflate.findViewById(R.id.details_pressure);
-        i = (ImageView) inflate.findViewById(R.id.details_image);
+        date = (TextView) inflate.findViewById(R.id.detail_date_textview);
+        h = (TextView) inflate.findViewById(R.id.detail_high_textview);
+        l = (TextView) inflate.findViewById(R.id.detail_low_textview);
+        d = (TextView) inflate.findViewById(R.id.detail_forecast_textview);
+        hum = (TextView) inflate.findViewById(R.id.detail_humidity_textview);
+        w = (TextView) inflate.findViewById(R.id.detail_wind_textview);
+        p = (TextView) inflate.findViewById(R.id.detail_pressure_textview);
+        i = (ImageView) inflate.findViewById(R.id.detail_icon);
         return inflate;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.detail, menu);
-
-        // Retrieve the share menu item
-        MenuItem menuItem = menu.findItem(R.id.menu_share);
-
-
-        // Get the provider and hold onto it to set/change the share intent.
-        mShareActionProvider = new ShareActionProvider(getContext());
-        MenuItemCompat.setActionProvider(menuItem, mShareActionProvider);
-
-        // If onLoadFinished happens before this, we can go ahead and set the share intent now.
-        mShareActionProvider.setShareIntent(createShareForecastIntent());
     }
 
     private Intent createShareForecastIntent() {
@@ -167,6 +153,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
+        ViewParent parent = getView().getParent();
+        if(parent instanceof CardView) ((View)parent).setVisibility(View.VISIBLE);
+
         if (!data.moveToFirst()) return;
 
         boolean isMetric = isMetric(getActivity());
@@ -178,32 +167,63 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         String high = formatTemperature(context, this.high, isMetric);
         this.low = data.getDouble(COL_WEATHER_MIN_TEMP);
         String low = formatTemperature(context, this.low, isMetric);
-        String weekDay = getWeekDay(calendarDate, context);
+        String d = getWeekDay(calendarDate, context) + ", " +
+                calendarDate.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()) +
+                " " + calendarDate.get(Calendar.DAY_OF_MONTH);
         String humidity = formatHumidity(context, data.getInt(COL_WEATHER_HUMIDITY));
         String wind = formatWind(context, data.getDouble(COL_WEATHER_WIND_SPEED),
                 data.getDouble(COL_WEATHER_DEGREES));
         String pressure = formatPressure(context, data.getDouble(COL_WEATHER_PRESSURE));
-        String image = Utility.getArtUrlForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID),context);
 
-        weekD.setText(weekDay);
-        String text = calendarDate.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()) +
-                " " + calendarDate.get(Calendar.DAY_OF_MONTH);
-        date.setText(text);
+        date.setText(d);
         h.setText(high);
         l.setText(low);
-        d.setText(weatherDescription);
+        this.d.setText(weatherDescription);
         hum.setText(humidity);
         w.setText(wind);
         p.setText(pressure);
 
-        int newSize = Utility.getSize(context, true);
-
-        Glide.with(context).load(image).override(newSize, newSize).into(i);
-
-        // If onCreateOptionsMenu has already happened, we need to update the share intent now.
-        if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(createShareForecastIntent());
+        if (!Utility.getIconStyle(context).equals("1")) {
+            int newSize = Utility.getSize(context, true);
+            String image = Utility.getArtUrlForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID), context);
+            Glide.with(context).load(image).override(newSize, newSize).into(i);
+        } else {
+            i.setImageResource(Utility.getArtResourceForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID)));
         }
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
+
+        // We need to start the enter transition after the data has loaded
+        if (activity instanceof DetailActivity) {
+            activity.supportStartPostponedEnterTransition();
+
+            if (null != toolbarView) {
+                activity.setSupportActionBar(toolbarView);
+
+                activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+                activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+        } else {
+            if (null != toolbarView) {
+                Menu menu = toolbarView.getMenu();
+                if (null != menu) menu.clear();
+                toolbarView.inflateMenu(R.menu.detail);
+                finishCreatingMenu(toolbarView.getMenu());
+            }
+        }
+    }
+
+    private void finishCreatingMenu(Menu menu) {
+        // Retrieve the share menu item
+        MenuItem menuItem = menu.findItem(R.id.menu_share);
+
+        // Get the provider and hold onto it to set/change the share intent.
+        mShareActionProvider = new ShareActionProvider(getContext());
+        MenuItemCompat.setActionProvider(menuItem, mShareActionProvider);
+
+        // If onLoadFinished happens before this, we can go ahead and set the share intent now.
+        mShareActionProvider.setShareIntent(createShareForecastIntent());
     }
 
     @Override

@@ -20,9 +20,9 @@
 
 
     <string name="format_temperature"><xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
-    <string name="format_humidity"><xliff:g id="humidity">Humidity: %d</xliff:g>%%</string>
-    <string name="format_wind_km"><xliff:g id="speed">Wind: %1.0f km/h </xliff:g><xliff:g id="destination">%2$s</xliff:g> </string>
-    <string name="format_pressure"><xliff:g id="pressure">Pressure: %1.0f</xliff:g> hPa</string>
+    <string name="format_humidity"><xliff:g id="humidity">%d</xliff:g>%%</string>
+    <string name="format_wind_km"><xliff:g id="speed">%1.0f km/h </xliff:g><xliff:g id="destination">%2$s</xliff:g> </string>
+    <string name="format_pressure"><xliff:g id="pressure">%1.0f</xliff:g> hPa</string>
 
     <string name="sync_account_type">sunshine.example.com</string>
     <string name="content_authority">com.example.android.sunshine.app</string>
@@ -69,5 +69,18 @@
 
     <string name="url">Url</string>
     <string name="icons_key">icons_key</string>
+    
+    <string name="server">AIzaSyCjsxP5y-dFvjiDjoVa5GDT_Z25hnv5Hys</string>
+    <string name="api_key">AIzaSyAjdvnL5q1NEvwG5jxkmfiTi8ZazRJmS9o</string>
+
+    <!-- Used to form a severe weather alert that reads "Heads up: <weather> in <location>!" -->
+    <string name="gcm_weather_alert">Heads up: %1$s in %2$s!</string>
+    // TODO: Get the SenderID from the Developer Console
+    <string name="gcm_SenderId" translatable="false">39208608892</string>
+    <!-- For Google Places API Attributions -->
+    <string name="attribution_text">Powered by Google</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind">Wind</string>
+    <string name="pressure">Pressure</string>
 
 </resources>

@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
-
-def MY_WEATHER_API_KEY = '"' + MyOpenWeatherMapApiKey + '"';
+ext{
+    supportLibVersion = '23.1.1'
+}
 
 android {
     compileSdkVersion 23
@@ -23,20 +24,20 @@ android {
     productFlavors {
     }
     buildTypes.each {
-        it.buildConfigField 'String', 'OPEN_WEATHER_MAP_API_KEY', MY_WEATHER_API_KEY
+        it.buildConfigField 'String', 'OPEN_WEATHER_MAP_API_KEY', MyOpenWeatherMapApiKey
     }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:support-annotations:23.1.1'
-    compile 'com.github.bumptech.glide:glide:3.6.1'
-    compile 'com.android.support:support-v4:23.1.1'
-    compile 'com.android.support:gridlayout-v7:23.1.1'
-    compile 'com.android.support:cardview-v7:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.google.android.gms:play-services-gcm:8.3.0'
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+    compile "com.android.support:support-annotations:${supportLibVersion}"
+    compile "com.android.support:support-v4:${supportLibVersion}"
+    compile "com.android.support:gridlayout-v7:${supportLibVersion}"
+    compile "com.android.support:cardview-v7:${supportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+    compile "com.github.bumptech.glide:glide:3.6.1"
+    compile "com.google.android.gms:play-services-gcm:8.3.0"
 }

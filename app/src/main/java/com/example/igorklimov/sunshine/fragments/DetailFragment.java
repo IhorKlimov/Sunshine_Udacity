@@ -45,8 +45,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
+    public static final String DETAIL_TRANSITION_ANIMATION = "DTA";
 
     private ShareActionProvider mShareActionProvider;
+    private boolean mTransitionAnimation;
 
     private TextView date;
     private TextView h;
@@ -95,7 +97,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View inflate = inflater.inflate(R.layout.fragment_detail_start, container, false);
-
+        Bundle arguments = getArguments();
+        if (arguments!=null)
+            mTransitionAnimation = arguments.getBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION);
         date = (TextView) inflate.findViewById(R.id.detail_date_textview);
         h = (TextView) inflate.findViewById(R.id.detail_high_textview);
         l = (TextView) inflate.findViewById(R.id.detail_low_textview);
@@ -195,19 +199,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
 
         // We need to start the enter transition after the data has loaded
-        if (activity instanceof DetailActivity) {
+        if ( mTransitionAnimation ) {
             activity.supportStartPostponedEnterTransition();
 
-            if (null != toolbarView) {
+            if ( null != toolbarView ) {
                 activity.setSupportActionBar(toolbarView);
 
                 activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
                 activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
         } else {
-            if (null != toolbarView) {
+            if ( null != toolbarView ) {
                 Menu menu = toolbarView.getMenu();
-                if (null != menu) menu.clear();
+                if ( null != menu ) menu.clear();
                 toolbarView.inflateMenu(R.menu.detail);
                 finishCreatingMenu(toolbarView.getMenu());
             }

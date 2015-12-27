@@ -5,7 +5,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +22,7 @@ import com.example.igorklimov.sunshine.fragments.DetailFragment;
 import com.example.igorklimov.sunshine.fragments.ForecastFragment;
 import com.example.igorklimov.sunshine.R;
 import com.example.igorklimov.sunshine.gcm.RegistrationIntentService;
+import com.example.igorklimov.sunshine.helpers.ForecastAdapter;
 import com.example.igorklimov.sunshine.helpers.Utility;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 import com.google.android.gms.common.ConnectionResult;
@@ -51,18 +55,20 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        location = Utility.getPreferredLocation(this);
 
         setContentView(R.layout.activity_main);
-        location = Utility.getPreferredLocation(this);
-        SunshineSyncAdapter.initializeSyncAdapter(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         isTablet = findViewById(R.id.weather_detail_container) != null;
-        PreferenceManager.setDefaultValues(this,R.xml.pref_general,false);
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putBoolean(getString(R.string.pref_is_tablet), isTablet)
+                .apply();
+        SunshineSyncAdapter.initializeSyncAdapter(this);
+
         if (checkPlayServices()) {
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(this);
@@ -83,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         ForecastFragment ff = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
         if (location != null && !location.equals(this.location)) {
             if (null != ff) ff.onLocationOrUnitSystemChanged();
-            Log.d("TAG", "onResume: ");
             DetailFragment df = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
             if (null != df) df.onLocationChanged(location);
             this.location = location;
@@ -94,10 +99,13 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
     }
 
     @Override
-    public void onItemSelected(Uri dateUri) {
+    public void onItemSelected(Uri dateUri, ForecastAdapter.ViewHolder holder) {
         if (!isTablet) {
             Intent intent = new Intent(this, DetailActivity.class).setData(dateUri);
-            startActivity(intent);
+            ActivityOptionsCompat activityOptions =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                            new Pair<View, String>(holder.image, getString(R.string.detail_icon_transition_name)));
+            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
         } else {
             DetailFragment newFragment = new DetailFragment();
             Bundle bundle = new Bundle();

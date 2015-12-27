@@ -3,7 +3,9 @@ package com.example.igorklimov.sunshine.helpers;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -97,6 +99,8 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
             Glide.with(context).load(Utility.getArtResourceForWeatherCondition(conditionId))
                     .override(newSize, newSize).into(holder.image);
         }
+        ViewCompat.setTransitionName(holder.image, "iconView" + position);
+
         mICM.onBindViewHolder(holder, position);
     }
 
@@ -148,7 +152,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView image;
+        public ImageView image;
         TextView date;
         TextView details;
         TextView high;
@@ -170,8 +174,8 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         public void onClick(View v) {
             cursor.moveToPosition(getAdapterPosition());
             long date = cursor.getLong(COL_WEATHER_DATE);
-            mClickHandler.onClick(date,this);
-            if(((MainActivity)context).isTablet)mICM.onClick(this);
+            mClickHandler.onClick(date, this);
+            if (Utility.isTablet(context)) mICM.onClick(this);
         }
     }
 

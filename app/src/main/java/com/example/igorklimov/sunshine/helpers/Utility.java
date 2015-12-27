@@ -38,6 +38,11 @@ public class Utility {
                 context.getString(R.string.location_default_value));
     }
 
+    public static boolean isTablet(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(context.getString(R.string.pref_is_tablet), false);
+    }
+
     public static boolean isNotificationOn(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(context.getString(R.string.key_notifications), true);

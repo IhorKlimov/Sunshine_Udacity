@@ -310,10 +310,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                         mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
                         int itemPosition = mForecastAdapter.getSelectedItemPosition();
                         if (RecyclerView.NO_POSITION == itemPosition) itemPosition = 0;
-                        Log.d("TAG", "onPreDraw: " + Utility.isTablet(context));
                         RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(itemPosition);
                         if (null != vh && Utility.isTablet(context)) {
-                            Log.d("TAG", "onPreDraw: ");
                             mForecastAdapter.selectView(vh);
                         }
                         if (mHoldForTransition) {

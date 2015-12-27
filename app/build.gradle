@@ -25,6 +25,7 @@ android {
     }
     buildTypes.each {
         it.buildConfigField 'String', 'OPEN_WEATHER_MAP_API_KEY', MyOpenWeatherMapApiKey
+        it.resValue 'string', 'GOOGLE_PLACES_API_KEY', MyGoolgePlacesApiKey
     }
 }
 
@@ -40,4 +41,5 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
     compile "com.github.bumptech.glide:glide:3.6.1"
     compile "com.google.android.gms:play-services-gcm:8.3.0"
+    compile "com.google.android.gms:play-services-location:8.3.0"
 }

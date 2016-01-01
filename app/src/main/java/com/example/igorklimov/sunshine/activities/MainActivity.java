@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.igorklimov.sunshine.activities;
 
 import android.content.Intent;
@@ -9,14 +25,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 
 import com.example.igorklimov.sunshine.fragments.DetailFragment;
 import com.example.igorklimov.sunshine.fragments.ForecastFragment;
@@ -28,11 +41,15 @@ import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import org.jetbrains.annotations.NotNull;
+
 public class MainActivity extends AppCompatActivity implements ForecastFragment.Callback {
 
-    private String location;
+    private String mLocation;
+    private Uri mUri;
     public boolean isTablet;
-    public static boolean iconStyleChanged;
+    public static boolean sIconStyleChanged;
+
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
@@ -57,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
-        location = Utility.getPreferredLocation(this);
+        mLocation = Utility.getPreferredLocation(this);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -78,6 +95,10 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
                 startService(intent);
             }
         }
+        Intent i = getIntent();
+        if (i != null && i.getData() != null) {
+            mUri = i.getData();
+        }
     }
 
     @Override
@@ -85,21 +106,26 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         super.onResume();
         Utility.setToday();
         String location = Utility.getPreferredLocation(this);
-        // update the location in our second pane using the fragment manager
+        // update the mLocation in our second pane using the fragment manager
         ForecastFragment ff = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
-        if (location != null && !location.equals(this.location)) {
+        if (location != null && !location.equals(this.mLocation)) {
             if (null != ff) ff.onLocationOrUnitSystemChanged();
             DetailFragment df = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
             if (null != df) df.onLocationChanged(location);
-            this.location = location;
-        } else if (iconStyleChanged) {
+            this.mLocation = location;
+        } else if (sIconStyleChanged) {
             if (null != ff) ff.onLocationOrUnitSystemChanged();
-            iconStyleChanged = false;
+            sIconStyleChanged = false;
         }
     }
 
+    /**
+     * This method opens detail view whether it's a handset - {@link DetailActivity} or on a tablet -
+     * {@link DetailFragment} in main layout.
+     * <p>mUri ternary check in case user pressed on item from a widget</p>
+     */
     @Override
-    public void onItemSelected(Uri dateUri, ForecastAdapter.ViewHolder holder) {
+    public void onItemSelected(@NotNull Uri dateUri, ForecastAdapter.ViewHolder holder) {
         if (!isTablet) {
             Intent intent = new Intent(this, DetailActivity.class).setData(dateUri);
             ActivityOptionsCompat activityOptions =
@@ -109,12 +135,13 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         } else {
             DetailFragment newFragment = new DetailFragment();
             Bundle bundle = new Bundle();
-            bundle.putParcelable("one", dateUri);
+            bundle.putParcelable("one", mUri == null ? dateUri : mUri);
             newFragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.weather_detail_container, newFragment, DETAILFRAGMENT_TAG);
             transaction.addToBackStack(null);
             transaction.commit();
+            mUri = null;
         }
     }
 

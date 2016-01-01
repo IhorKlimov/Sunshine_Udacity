@@ -10,6 +10,7 @@
         android:key="@string/location_key"
         android:singleLine="true"
         android:title="@string/location_title"
+        android:summary="%s"
         custom:minimumLength="3" />
 
     <ListPreference

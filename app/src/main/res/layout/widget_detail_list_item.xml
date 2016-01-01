@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:paddingLeft="@dimen/forecast_temperature_space"
+    android:paddingStart="@dimen/forecast_temperature_space"
+    android:paddingRight="@dimen/forecast_temperature_space"
+    android:paddingEnd="@dimen/forecast_temperature_space"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/widget_icon"
+        android:layout_width="@dimen/list_icon"
+        android:layout_height="@dimen/list_icon"
+        android:layout_gravity="center" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_marginLeft="@dimen/widget_details_horizontal_margin"
+        android:layout_marginStart="@dimen/widget_details_horizontal_margin"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+        <TextView
+            android:id="@+id/widget_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/secondary_text" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/widget_temp_max"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:textColor="@color/primary_text"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/widget_temp_min"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:textColor="@color/forecast_low_text"
+        android:textSize="18sp" />
+
+</LinearLayout>

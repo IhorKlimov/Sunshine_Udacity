@@ -91,5 +91,6 @@
     <string name="wind">Wind</string>
     <string name="pressure">Pressure</string>
     <string name="detail_icon_transition_name">Detail Icon</string>
+    <string name="widget_data_not_available">Not Available</string>
 
 </resources>

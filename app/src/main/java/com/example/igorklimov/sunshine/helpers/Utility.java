@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.igorklimov.sunshine.helpers;
 
 import android.content.Context;
@@ -7,30 +23,29 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.bumptech.glide.Glide;
 import com.example.igorklimov.sunshine.R;
-import com.example.igorklimov.sunshine.data.WeatherContract;
-import com.example.igorklimov.sunshine.fragments.ForecastFragment;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter;
 import com.example.igorklimov.sunshine.sync.SunshineSyncAdapter.LocationStatus;
 
-import java.net.URI;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry.COLUMN_DATE;
 import static com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry.COLUMN_SHORT_DESC;
+import static com.example.igorklimov.sunshine.data.WeatherContract.WeatherEntry.COLUMN_WEATHER_ID;
 
 public class Utility {
+    private static final String TAG = "Utility";
+
 
     static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d", Locale.US);
     static final SimpleDateFormat WEEK_DAY_FORMAT = new SimpleDateFormat("EEEE", Locale.getDefault());
     static final SimpleDateFormat FULL_FORMAT = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
-    private static int today = Integer.parseInt(Utility.DATE_FORMAT
+    private static int sToday = Integer.parseInt(Utility.DATE_FORMAT
             .format(new Date(System.currentTimeMillis())));
+    public static float DEFAULT_LATLONG = 0F;
 
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -38,8 +53,6 @@ public class Utility {
                 context.getString(R.string.location_default_value));
     }
 
-    // We'll default our latlong to 0. Yay, "Earth!"
-    public static float DEFAULT_LATLONG = 0F;
 
     public static boolean isLocationLatLonAvailable(Context context) {
         SharedPreferences prefs
@@ -78,9 +91,9 @@ public class Utility {
         return string.equals(context.getString(R.string.metric)) || string.equals(1 + "");
     }
 
-    public static String formatTemperature(Context context, double temperature,
-                                           boolean isMetric) {
+    public static String formatTemperature(Context context, double temperature) {
         double temp;
+        boolean isMetric = isMetric(context);
         if (!isMetric) temp = 9 * temperature / 5 + 32;
         else temp = temperature;
         if (temp > -1 && temp < 0) temp = 0;
@@ -90,8 +103,8 @@ public class Utility {
     public static String getForecast(Context context, double high, double low, String desc) {
         return String.format(context.getString(R.string.format_notification),
                 desc,
-                Utility.formatTemperature(context, high, isMetric(context)),
-                Utility.formatTemperature(context, low, isMetric(context)));
+                Utility.formatTemperature(context, high),
+                Utility.formatTemperature(context, low));
     }
 
     public static Calendar getCalendarDate(long dateInMillis) {
@@ -101,7 +114,7 @@ public class Utility {
     }
 
     public static void setToday() {
-        today = Integer.parseInt(Utility.DATE_FORMAT.format(new Date(System.currentTimeMillis())));
+        sToday = Integer.parseInt(Utility.DATE_FORMAT.format(new Date(System.currentTimeMillis())));
     }
 
     public static void setLocationStatusPreference(@LocationStatus int status, Context context) {
@@ -122,22 +135,23 @@ public class Utility {
                 .getInt(context.getString(R.string.location_status_key), SunshineSyncAdapter.LOCATION_STATUS_OK);
     }
 
-    static String getCalendarDate(Cursor cursor, Context c) {
+    public static String getCalendarDate(Cursor cursor, Context c) {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(cursor.getLong(ForecastFragment.COL_WEATHER_DATE));
-
+        int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        cal.setTimeInMillis(cursor.getLong(cursor.getColumnIndex(COLUMN_DATE)));
         int day = cal.get(Calendar.DAY_OF_MONTH);
+
         String res;
-        if (day == today) {
+        if (day == sToday) {
             res = getWeekDay(cal, c) + ", "
                     + cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
                     + " " + day;
-        } else if (day > today && day <= today + 6) {
+        } else if (day > sToday && day <= sToday + 6
+                || (daysInMonth - sToday + day) <= 6) {
             res = getWeekDay(cal, c);
         } else {
             res = FULL_FORMAT.format(cal.getTime());
         }
-
         return res;
     }
 
@@ -145,8 +159,8 @@ public class Utility {
         int day = date.get(Calendar.DAY_OF_MONTH);
         String result;
 
-        if (day == today) result = c.getString(R.string.today);
-        else if (day == today + 1) result = c.getString(R.string.tomorrow);
+        if (day == sToday) result = c.getString(R.string.today);
+        else if (day == sToday + 1) result = c.getString(R.string.tomorrow);
         else result = WEEK_DAY_FORMAT.format(date.getTime());
 
         return result;
@@ -214,12 +228,12 @@ public class Utility {
      * Helper method to provide the art resource id according to the weather condition id returned
      * by the OpenWeatherMap call.
      *
-     * @param weatherId from OpenWeatherMap API response
      * @return resource id for the corresponding image. -1 if no relation is found.
      */
-    public static int getArtResourceForWeatherCondition(int weatherId) {
+    public static int getArtResourceForWeatherCondition(Cursor cursor, Context context) {
         // Based on weather code data found at:
         // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
+        int weatherId = cursor.getInt(cursor.getColumnIndex(COLUMN_WEATHER_ID));
         if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.art_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {

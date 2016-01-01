@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SyncAdapterType;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -188,7 +187,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             pref.setSummary(getSummary(Utility.getPreferredLocation(context)));
         } else if (key.equals(context.getString(R.string.icons_key))) {
             Log.d("TAG", "onSharedPreferenceChanged: icon style changed");
-            MainActivity.iconStyleChanged = true;
+            MainActivity.sIconStyleChanged = true;
         }
     }
 }

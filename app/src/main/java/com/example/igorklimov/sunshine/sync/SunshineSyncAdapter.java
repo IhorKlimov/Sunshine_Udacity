@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2015 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.igorklimov.sunshine.sync;
 
 import android.accounts.Account;
@@ -54,6 +70,9 @@ import static com.example.igorklimov.sunshine.helpers.Utility.getForecast;
 import static com.example.igorklimov.sunshine.helpers.Utility.isNotificationOn;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
+    public static final String ACTION_DATE_UPDATED =
+            "com.example.igorklimov.sunshine.ACTION_DATA_UPDATED";
+
     private Context context;
 
     private static final int SYNC_INTERVAL = 60 * 180;
@@ -108,9 +127,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
-        Log.d("TAG", "onPerformSync Called.");
-        // We no longer need just the location String, but also potentially the latitude and
-        // longitude, in case we are syncing based on a new Place Picker API result.
         Context context = getContext();
         String locationQuery = Utility.getPreferredLocation(context);
         String locationLatitude = String.valueOf(Utility.getLocationLatitude(context));
@@ -367,6 +383,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                             new String[]{dayTime.setJulianDay(julianStartDay - 1) + ""});
                     context.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
                     Log.d("TAG", delete + " deleted");
+                    Intent dataUpdatedIntent = new Intent(ACTION_DATE_UPDATED);
+                    context.sendBroadcast(dataUpdatedIntent);
                     if (isNotificationOn(context)) notifyWeather();
                 }
                 Utility.setLocationStatusPreference(LOCATION_STATUS_OK, context);
@@ -481,7 +499,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                 } else {
                     bitmap = BitmapFactory.decodeResource(context.getResources(),
-                            Utility.getArtResourceForWeatherCondition(weatherId));
+                            Utility.getArtResourceForWeatherCondition(cursor,context));
                 }
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
